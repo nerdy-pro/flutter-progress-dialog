@@ -53,7 +53,7 @@ class _ProgressBarDialogState<T> extends State<ProgressBarDialog<T>> {
   @override
   void initState() {
     Future<void>(() async {
-      Result? result;
+      Result<T>? result;
       try {
         final futureResult = await widget.future();
         result = Result.ok(futureResult);
