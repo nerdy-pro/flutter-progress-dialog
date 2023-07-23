@@ -40,13 +40,15 @@ class _MyHomePageState extends State<MyHomePage> {
         _counter;
       });
     } else {
-      _counter = 3;
+      throw 'error';
     }
   }
 
   Future _onIncrementCounter(BuildContext context) async {
-    final result =
-        await showProgressDialog(context: context, future: () => myFuture());
+    final result = await showProgressDialog(
+      context: context,
+      future: () => myFuture(),
+    );
     if (!mounted || result == null) {
       return;
     }
@@ -60,18 +62,17 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _counter = 0;
+                    });
+                  },
                   child: const Text(
                     'OK',
                   ),
                 )
               ]);
-        },
-      ).then(
-        (value) {
-          setState(() {
-            _counter = 0;
-          });
         },
       );
     }
