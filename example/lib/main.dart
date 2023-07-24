@@ -44,6 +44,21 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<Result<T>?> showProgressDialog<T>({
+    required BuildContext context,
+    required Future<T> Function() future,
+    bool cancelOnTapOutside = true,
+    bool useRootNavigator = true,
+  }) async {
+    final result = await showDialog<Result<T>>(
+      barrierDismissible: cancelOnTapOutside,
+      useRootNavigator: useRootNavigator,
+      context: context,
+      builder: (context) => ProgressBarDialog<T>(future: future),
+    );
+    return result;
+  }
+
   Future _onIncrementCounter(BuildContext context) async {
     final result = await showProgressDialog(
       context: context,

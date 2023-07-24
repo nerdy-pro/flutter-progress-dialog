@@ -4,21 +4,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-Future<Result<T>?> showProgressDialog<T>({
-  required BuildContext context,
-  required Future<T> Function() future,
-  bool cancelOnTapOutside = true,
-  bool useRootNavigator = true,
-}) async {
-  final result = await showDialog<Result<T>>(
-    barrierDismissible: cancelOnTapOutside,
-    useRootNavigator: useRootNavigator,
-    context: context,
-    builder: (context) => ProgressBarDialog<T>(future: future),
-  );
-  return result;
-}
-
 class ProgressBarDialog<T> extends StatefulWidget {
   final Future<T> Function() future;
 
@@ -54,21 +39,25 @@ class Result<T> {
 }
 
 class _ProgressBarDialogState<T> extends State<ProgressBarDialog<T>> {
+  Future<void> _getResult({
+    required Future<T> Function() future,
+  }) async {
+    late Result<T> result;
+    try {
+      final futureResult = await future();
+      result = Result.ok(futureResult);
+    } catch (e, s) {
+      result = Result.error(e, s);
+    } finally {
+      if (mounted) {
+        Navigator.of(context).pop(result);
+      }
+    }
+  }
+
   @override
   void initState() {
-    Future<void>(() async {
-      late Result<T> result;
-      try {
-        final futureResult = await widget.future();
-        result = Result.ok(futureResult);
-      } catch (e, s) {
-        result = Result.error(e, s);
-      } finally {
-        if (mounted) {
-          Navigator.of(context).pop(result);
-        }
-      }
-    }); //then((value) => Navigator.of(context).pop(value));
+    _getResult(future: widget.future);
     super.initState();
   }
 
