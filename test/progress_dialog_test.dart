@@ -5,21 +5,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
-Future<Result<T>?> showProgressDialog<T>({
-  required BuildContext context,
-  required Future<T> Function() future,
-  bool cancelOnTapOutside = true,
-  bool useRootNavigator = true,
-}) async {
-  final result = await showDialog<Result<T>>(
-    barrierDismissible: cancelOnTapOutside,
-    useRootNavigator: useRootNavigator,
-    context: context,
-    builder: (context) => ProgressBarDialog<T>(future: future),
-  );
-  return result;
-}
-
 void main() {
   testWidgets('showProgressDialog completes with some value',
       (WidgetTester tester) async {
