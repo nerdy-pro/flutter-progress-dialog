@@ -54,12 +54,10 @@ class Result<T> {
 }
 
 class _ProgressBarDialogState<T> extends State<ProgressBarDialog<T>> {
-  Future<void> _getResult({
-    required Future<T> Function() future,
-  }) async {
+  Future<void> _getResult() async {
     late Result<T> result;
     try {
-      final futureResult = await future();
+      final futureResult = await widget.future();
       result = Result.ok(futureResult);
     } catch (e, s) {
       result = Result.error(e, s);
@@ -72,7 +70,7 @@ class _ProgressBarDialogState<T> extends State<ProgressBarDialog<T>> {
 
   @override
   void initState() {
-    _getResult(future: widget.future);
+    _getResult().ignore();
     super.initState();
   }
 
