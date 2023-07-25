@@ -16,7 +16,7 @@ Future<Result<T>?> showProgressDialog<T>({
     context: context,
     builder: (context) => ProgressBarDialog<T>(future: future),
   );
-  return result;
+  return result!;
 }
 
 class ProgressBarDialog<T> extends StatefulWidget {
