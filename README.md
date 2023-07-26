@@ -7,7 +7,7 @@ Show progress dialog with animation while waiting for Future completion and then
 
 ## Features
 
-![](https://github.com/nerdy-pro/flutter-progress-dialog/tree/develop/img/appVideo.mov)
+![](https://github.com/nerdy-pro/flutter-progress-dialog/blob/develop/img/progress_dialog.gif)
 
 ## Getting started
 
