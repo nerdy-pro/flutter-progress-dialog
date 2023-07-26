@@ -1,12 +1,12 @@
 ## progress_dialog
 
-![Pub Version](https://img.shields.io/pub/v/progress_dialog)
-![GitHub](https://img.shields.io/github/license/nerdy-pro/progress_dialog)
+![Pub Version](https://img.shields.io/pub/v/flutter_progress_dialog)
+![GitHub](https://img.shields.io/github/license/nerdy-pro/flutter_progress_dialog)
 
 Show progress dialog with animation while waiting for Future completion and then return the result of that Future.
 
 ## Features
-(https://github.com/nerdy-pro/progress-dialog
+(https://github.com/nerdy-pro/flutter-progress-dialog/tree/develop/img/appVideo.mov)
 
 ## Getting started
 
