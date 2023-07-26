@@ -6,7 +6,10 @@
 Show progress dialog with animation while waiting for Future completion and then return the result of that Future.
 
 ## Features
-https://github.com/nerdy-pro/flutter-progress-dialog/tree/develop/img/appVideo.mov
+
+<figure class="video_container">
+  <iframe src="https://github.com/nerdy-pro/flutter-progress-dialog/tree/develop/img/appVideo.mov" frameborder="0" allowfullscreen="true"> </iframe>
+</figure>
 
 ## Getting started
 
