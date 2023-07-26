@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _counter;
       });
     } else {
-      throw 'error';
+      throw 'Error: Something went wrong';
     }
   }
 
@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
       context: context,
       future: () => myFuture(),
     );
-    if (!mounted || result == null) {
+    if (!mounted) {
       return;
     }
     if (result.isError) {
