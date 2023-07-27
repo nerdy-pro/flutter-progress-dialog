@@ -26,7 +26,8 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 
 ## Usage
 
-Working example can be found in /example directory.
+Working example can be found in [/example](https://github.com/nerdy-pro/flutter-progress-dialog/tree/develop/example) directory.
+
 Use the showProgressDialog function. 
 
 ```dart
@@ -45,8 +46,10 @@ Future<Result<T>> showProgressDialog<T>({
 }
 ```
 Here is some example of showProgressDialog usage.
+
 Call the showProgressDialog inside your function. Pass 'context' and 'future' arguments. Then handle
 result.
+
 ```dart
 Future<void> someYourFunction(BuildContext context) async {
   final result = await showProgressDialog(
