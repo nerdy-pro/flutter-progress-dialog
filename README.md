@@ -26,16 +26,57 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+Working example can be found in /example directory.
+Use the showProgressDialog function. 
 
 ```dart
-
-const like = 'sample';
+Future<Result<T>> showProgressDialog<T>({
+  required BuildContext context,
+  required Future<T> Function() future,
+  bool useRootNavigator = true,
+}) async {
+  final result = await showDialog<Result<T>>(
+    barrierDismissible: false,
+    useRootNavigator: useRootNavigator,
+    context: context,
+    builder: (context) => ProgressBarDialog<T>(future: future),
+  );
+  return result!;
+}
 ```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+Here is some example of showProgressDialog usage.
+Call the showProgressDialog inside your function. Pass 'context' and 'future' arguments. Then handle
+result.
+```dart
+Future<void> someYourFunction(BuildContext context) async {
+  final result = await showProgressDialog(
+    context: context,
+    future: () => myFuture(),
+  );
+  if (!mounted) {
+    return;
+  }
+  if (result.isError) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+            content: Text(
+              '${result.requireError}',
+              textAlign: TextAlign.center,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  'OK',
+                ),
+              )
+            ]);
+      },
+    );
+  } 
+}
+```
