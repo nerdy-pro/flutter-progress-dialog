@@ -1,6 +1,6 @@
 name: progress_dialog
 description: Allows to display progress dialog while the Future function completes.
-version: 0.0.1
+version: 1.0.0
 homepage: https://github.com/nerdy-pro/flutter-progress-dialog
 
 environment:
