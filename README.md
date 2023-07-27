@@ -11,8 +11,18 @@ Show progress dialog with animation while waiting for Future completion and then
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+- install the library
+
+```shell
+flutter pub add flutter_progress_dialog
+```
+
+- import the library
+
+```dart
+import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+```
+
 
 ## Usage
 

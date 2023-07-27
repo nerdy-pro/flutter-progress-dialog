@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:progress_dialog/progress_dialog.dart';
+import 'package:progress_dialog/flutter_progress_dialog.dart';
 
 void main() {
   runApp(const MyApp());
