@@ -32,12 +32,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  String _yourFutureResult = '';
 
   Future<void> myFuture() async {
     await Future<void>.delayed(const Duration(seconds: 2), () => _counter++);
     if (_counter < 3) {
       setState(() {
         _counter;
+        _yourFutureResult = 'Result $_counter';
       });
     } else {
       throw 'Error: Something went wrong';
@@ -59,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
           return AlertDialog(
               content: Text(
                 '${result.requireError}',
+                textAlign: TextAlign.center,
               ),
               actions: [
                 TextButton(
@@ -66,6 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).pop();
                     setState(() {
                       _counter = 0;
+                      _yourFutureResult = '';
                     });
                   },
                   child: const Text(
@@ -89,12 +93,14 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              'Your Future will return result here',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              _yourFutureResult,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ],
         ),
