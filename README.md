@@ -1,4 +1,4 @@
-## progress_dialog
+## flutter_progress_dialog
 
 ![Pub Version](https://img.shields.io/pub/v/flutter_progress_dialog)
 ![GitHub](https://img.shields.io/github/license/nerdy-pro/flutter_progress_dialog)
