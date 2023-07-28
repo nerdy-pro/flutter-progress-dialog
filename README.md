@@ -76,10 +76,6 @@ Future<void> yourFunction(BuildContext context) async {
 ```
 
 Optionally you can pass a `builder` to have a custom progress dialog
-```dart
-
-
-Use the showProgressDialog function. 
 
 ```dart
 Future<void> buttonCallback({
@@ -94,5 +90,4 @@ Future<void> buttonCallback({
   );
   return result!;
 }
-```
 ```
