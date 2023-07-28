@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:progress_dialog/src/result.dart';
+import 'package:progress_dialog/result.dart';
 
-///Widget displays the [Dialog] with the [CircularProgressIndicator] while the [Future] '_getResult' is performs.
-
+/// Widget displays the [Dialog] white the provided [future] is being evaluated.
+/// Optionally you can provide a custom [builder] which will be used instead of the default [Dialog].
 class ProgressBarDialog<T> extends StatefulWidget {
   final Future<T> Function() future;
+  final WidgetBuilder? builder;
 
   const ProgressBarDialog({
     super.key,
     required this.future,
+    this.builder,
   });
 
   @override
@@ -16,7 +18,7 @@ class ProgressBarDialog<T> extends StatefulWidget {
 }
 
 class _ProgressBarDialogState<T> extends State<ProgressBarDialog<T>> {
-  Future<void> _getResult() async {
+  Future<void> _evaluateFuture() async {
     late Result<T> result;
     try {
       final futureResult = await widget.future();
@@ -32,23 +34,28 @@ class _ProgressBarDialogState<T> extends State<ProgressBarDialog<T>> {
 
   @override
   void initState() {
-    _getResult().ignore();
+    _evaluateFuture().ignore();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Dialog(
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: SizedBox(
-          height: 40,
-          width: 40,
-          child: Center(
-            child: CircularProgressIndicator(),
+    final builder = widget.builder;
+    if (builder != null) {
+      return builder(context);
+    } else {
+      return const Dialog(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: SizedBox(
+            height: 40,
+            width: 40,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 }
