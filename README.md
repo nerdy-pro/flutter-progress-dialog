@@ -1,5 +1,6 @@
-## flutter_progress_dialog
-
+## flutter_future_progress_dialog
+![Pub Version](https://img.shields.io/pub/v/flutter_future_progress_dialog)
+![GitHub](https://img.shields.io/github/license/nerdy-pro/flutter-progress-dialog)
 
 Show progress dialog with animation while waiting for Future completion and then return the result of that Future.
 
@@ -12,13 +13,13 @@ Show progress dialog with animation while waiting for Future completion and then
 - install the library
 
 ```shell
-flutter pub add flutter_progress_dialog
+flutter pub add flutter_future_progress_dialog
 ```
 
 - import the library
 
 ```dart
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
+import 'package:flutter_future_progress_dialog/flutter_future_progress_dialog.dart';
 ```
 
 
@@ -26,30 +27,19 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 
 Working example can be found in [/example](https://github.com/nerdy-pro/flutter-progress-dialog/tree/develop/example) directory.
 
-Use the showProgressDialog function. 
+Here is a short example of `showProgressDialog`` usage.
 
-```dart
-Future<Result<T>> showProgressDialog<T>({
-  required BuildContext context,
-  required Future<T> Function() future,
-  bool useRootNavigator = true,
-}) async {
-  final result = await showDialog<Result<T>>(
-    barrierDismissible: false,
-    useRootNavigator: useRootNavigator,
-    context: context,
-    builder: (context) => ProgressBarDialog<T>(future: future),
-  );
-  return result!;
-}
-```
-Here is some example of showProgressDialog usage.
-
-Call the showProgressDialog inside your function. Pass 'context' and 'future' arguments. Then handle
+Call the `showProgressDialog` inside your function. Pass `context` and `future` arguments. Then handle
 result.
 
 ```dart
-Future<void> someYourFunction(BuildContext context) async {
+
+Future<String> myFuture() async {
+  await Future.delayed(const Duration(seconds: 2));
+  return 'my string';
+}
+
+Future<void> yourFunction(BuildContext context) async {
   final result = await showProgressDialog(
     context: context,
     future: () => myFuture(),
@@ -74,10 +64,35 @@ Future<void> someYourFunction(BuildContext context) async {
                 child: const Text(
                   'OK',
                 ),
-              )
-            ]);
+              ),
+            ],
+          );
       },
     );
-  } 
+    return;
+  }
+  const result = result.requireValue; // result variable would hold the 'my string' value here 
 }
+```
+
+Optionally you can pass a `builder` to have a custom progress dialog
+```dart
+
+
+Use the showProgressDialog function. 
+
+```dart
+Future<void> buttonCallback({
+  required BuildContext context,
+}) async {
+  final result = await showProgressDialog(
+    future: () => myLongRunningTask(),
+    context: context,
+    builder: (context) => AlertDialog(
+      content: Text('I am loading now'),
+    ),
+  );
+  return result!;
+}
+```
 ```

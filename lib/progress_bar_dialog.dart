@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_progress_dialog/result.dart';
+import 'package:flutter_future_progress_dialog/result.dart';
 
 /// Widget displays the [Dialog] white the provided [future] is being evaluated.
 /// Optionally you can provide a custom [builder] which will be used instead of the default [Dialog].

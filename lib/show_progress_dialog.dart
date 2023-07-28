@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_progress_dialog/progress_bar_dialog.dart';
-import 'package:flutter_progress_dialog/result.dart';
+import 'package:flutter_future_progress_dialog/progress_bar_dialog.dart';
+import 'package:flutter_future_progress_dialog/result.dart';
 
 /// Function takes the `context`, the `useRootNavigator` and the `future` arguments.
 /// Optionally you can provide a custom [builder] which will be used instead of the default [Dialog].
