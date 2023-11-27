@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:progress_dialog/flutter_progress_dialog.dart';
+import 'package:progress_dialog/src/result.dart';
 
 void main() {
   runApp(const MyApp());
@@ -54,31 +55,34 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!mounted) {
       return;
     }
-    if (result.isError) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-              content: Text(
-                '${result.requireError}',
-                textAlign: TextAlign.center,
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    setState(() {
-                      _counter = 0;
-                      _yourFutureResult = '';
-                    });
-                  },
-                  child: const Text(
-                    'OK',
-                  ),
-                )
-              ]);
-        },
-      );
+    switch (result) {
+      case ResultOk<void>():
+        break;
+      case ResultError<void>(error: final error):
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+                content: Text(
+                  '$error',
+                  textAlign: TextAlign.center,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        _counter = 0;
+                        _yourFutureResult = '';
+                      });
+                    },
+                    child: const Text(
+                      'OK',
+                    ),
+                  )
+                ]);
+          },
+        );
     }
   }
 
