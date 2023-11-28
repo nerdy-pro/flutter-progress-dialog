@@ -1,35 +1,50 @@
-///Used to return the result of an asynchronous function or an error if it was thrown.
-class Result<T> {
-  final T? _value;
+///Used in ProgressBarDialog widget to store result returned by the Future which is called
+///inside the private [_getResult] function.
+sealed class Result<T> {
+  /// Left as a back compatibility with old versions of the library.
+  /// @deprecated Use pattern matching of this class instead: its either [ResultOk] or [ResultError].
+  bool get isError;
+}
 
-  final Object? _error;
+/// Creates the Result object with [value] containing some value.
+class ResultOk<T> extends Result<T> {
+  /// [value] property is used to store value of the type T?.
+  final T? value;
 
-  final StackTrace? _stackTrace;
+  @override
+  bool get isError => false;
 
-  /// Creates the Result object with [v] containing some value.
-  Result.ok(T v)
-      : _value = v,
-        _error = null,
-        _stackTrace = null;
+  ResultOk({this.value});
 
-  /// Creates the Result object with [e] and [s] containing error object and stackTrace object respectively.
-  Result.error(Object e, StackTrace s)
-      : _error = e,
-        _value = null,
-        _stackTrace = s;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is ResultOk && runtimeType == other.runtimeType && value == other.value;
 
-  ///Returns true if the error is not null.
-  bool get isError => _error != null;
+  @override
+  int get hashCode => value.hashCode;
+}
 
-  /// Getter for the error.
-  /// Be sure to check [isError] before calling this getter.
-  Object get requireError => _error!;
+/// Creates the Result object with [error] and [stackTrace] containing error object and stackTrace object respectively.
+class ResultError<T> extends Result<T> {
+  /// [error] property stores object of the Object? type.
+  final Object? error;
 
-  /// Getter for the stackTrace.
-  /// Be sure to check [isError] before calling this getter.
-  StackTrace get requireStackTrace => _stackTrace!;
+  /// [stackTrace] property stores object of the StackTrace? type.
+  final StackTrace? stackTrace;
 
-  /// Getter for the value property.
-  /// Be sure to check [isError] before calling this getter.
-  T get requireValue => _value!;
+  @override
+  bool get isError => true;
+
+  ResultError({this.error, this.stackTrace});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ResultError &&
+          runtimeType == other.runtimeType &&
+          error == other.error &&
+          stackTrace == other.stackTrace;
+
+  @override
+  int get hashCode => error.hashCode ^ stackTrace.hashCode;
 }

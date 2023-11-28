@@ -46,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future _onIncrementCounter(BuildContext context) async {
+  Future<void> _onIncrementCounter(BuildContext context) async {
     final result = await showProgressDialog(
       context: context,
       future: () => myFuture(),
@@ -54,13 +54,16 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!mounted) {
       return;
     }
-    if (result.isError) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
+    switch (result) {
+      case ResultOk<void>():
+        break;
+      case ResultError<void>(error: final error):
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
               content: Text(
-                '${result.requireError}',
+                '$error',
                 textAlign: TextAlign.center,
               ),
               actions: [
@@ -76,9 +79,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     'OK',
                   ),
                 )
-              ]);
-        },
-      );
+              ],
+            );
+          },
+        );
     }
   }
 

@@ -38,8 +38,9 @@ void main() {
     );
     await tester.pumpAndSettle();
     final result = await completer.future;
-    expect(result?.isError, false);
-    expect(result?.requireValue, 'ok');
+    expect(result.runtimeType, ResultOk<String>);
+    result as ResultOk<String>;
+    expect(result.value, 'ok');
   });
 
   testWidgets('showProgressDialog completes with some error',
@@ -52,7 +53,8 @@ void main() {
           await Future.delayed(
             const Duration(seconds: 1),
           );
-          throw 'error';
+          final error = await Future<String>.error('error');
+          return error;
         },
       );
       completer.complete(result);
@@ -74,7 +76,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     final result = await completer.future;
-    expect(result?.isError, true);
-    expect(result?.requireError, 'error');
+    expect(result.runtimeType, ResultError<String>);
+    result as ResultError<String>;
+    expect(result.error, 'error');
   });
 }
