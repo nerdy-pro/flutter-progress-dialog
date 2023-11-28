@@ -48,7 +48,7 @@ Future<void> yourFunction(BuildContext context) async {
     return;
   }
   switch (result) {
-    case ResultError<String>(error: final error):
+    case ResultError(error: final error):
       await showDialog(
         context: context,
         builder: (context) {
