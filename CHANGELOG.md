@@ -5,3 +5,7 @@
 ## 1.1.0
 
 * Migrated to `sealed class` usage for result handling.
+
+## 1.1.1
+
+* Fixed nullable values in result.
