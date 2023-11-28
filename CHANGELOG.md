@@ -1,3 +1,7 @@
 ## 1.0.0
 
 * Initial library release.
+
+## 1.1.0
+
+* Migrated to `sealed class` usage for result handling.

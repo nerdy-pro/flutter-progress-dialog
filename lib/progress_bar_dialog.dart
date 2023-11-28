@@ -22,9 +22,9 @@ class _ProgressBarDialogState<T> extends State<ProgressBarDialog<T>> {
     late Result<T> result;
     try {
       final futureResult = await widget.future();
-      result = Result.ok(futureResult);
+      result = ResultOk<T>(value: futureResult);
     } catch (e, s) {
-      result = Result.error(e, s);
+      result = ResultError<T>(error: e, stackTrace: s);
     } finally {
       if (mounted) {
         Navigator.of(context).pop(result);
