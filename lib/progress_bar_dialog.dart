@@ -19,16 +19,11 @@ class ProgressBarDialog<T> extends StatefulWidget {
 
 class _ProgressBarDialogState<T> extends State<ProgressBarDialog<T>> {
   Future<void> _evaluateFuture() async {
-    late Result<T> result;
-    try {
-      final futureResult = await widget.future();
-      result = ResultOk<T>(value: futureResult);
-    } catch (e, s) {
-      result = ResultError<T>(error: e, stackTrace: s);
-    } finally {
-      if (mounted) {
-        Navigator.of(context).pop(result);
-      }
+    final result = await Result.runCatchingFuture(() async {
+      return await widget.future();
+    });
+    if (mounted) {
+      Navigator.of(context).pop(result);
     }
   }
 

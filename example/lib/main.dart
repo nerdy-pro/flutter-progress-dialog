@@ -32,18 +32,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  String _yourFutureResult = '';
 
-  Future<void> myFuture() async {
-    await Future<void>.delayed(const Duration(seconds: 2), () => _counter++);
-    if (_counter < 3) {
-      setState(() {
-        _counter;
-        _yourFutureResult = 'Result $_counter';
-      });
-    } else {
-      throw 'Error: Something went wrong';
+  Future<int> myFuture() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (_counter >= 3) {
+      throw 'Something went wrong';
     }
+    return _counter + 1;
   }
 
   Future<void> _onIncrementCounter(BuildContext context) async {
@@ -55,9 +50,12 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
     switch (result) {
-      case ResultOk<void>():
+      case ResultOk<int>(value: final value):
+        setState(() {
+          _counter = value;
+        });
         break;
-      case ResultError<void>(error: final error):
+      case ResultError(error: final error):
         await showDialog(
           context: context,
           builder: (context) {
@@ -72,7 +70,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).pop();
                     setState(() {
                       _counter = 0;
-                      _yourFutureResult = '';
                     });
                   },
                   child: const Text(
@@ -103,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const SizedBox(height: 4),
             Text(
-              _yourFutureResult,
+              '_counter: $_counter',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
           ],
