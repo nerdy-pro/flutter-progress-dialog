@@ -1,20 +1,37 @@
-///Used in ProgressBarDialog widget to store result returned by the Future which is called
-///inside the private [_getResult] function.
+///Used in ProgressBarDialog widget to store result returned by the Future.
 sealed class Result<T> {
   /// Left as a back compatibility with old versions of the library.
   /// @deprecated Use pattern matching of this class instead: its either [ResultOk] or [ResultError].
   bool get isError;
+
+  static Result<T> runCatching<T>(T Function() f) {
+    try {
+      final result = f();
+      return ResultOk(value: result);
+    } catch (e, s) {
+      return ResultError(error: e, stackTrace: s);
+    }
+  }
+
+  static Future<Result<T>> runCatchingFuture<T>(Future<T> Function() f) async {
+    try {
+      final result = await f();
+      return ResultOk(value: result);
+    } catch (e, s) {
+      return ResultError(error: e, stackTrace: s);
+    }
+  }
 }
 
 /// Creates the Result object with [value] containing some value.
 class ResultOk<T> extends Result<T> {
-  /// [value] property is used to store value of the type T?.
-  final T? value;
+  /// [value] property holds the value returned by the Future.
+  final T value;
 
   @override
   bool get isError => false;
 
-  ResultOk({this.value});
+  ResultOk({required this.value});
 
   @override
   bool operator ==(Object other) =>
@@ -26,16 +43,16 @@ class ResultOk<T> extends Result<T> {
 
 /// Creates the Result object with [error] and [stackTrace] containing error object and stackTrace object respectively.
 class ResultError<T> extends Result<T> {
-  /// [error] property stores object of the Object? type.
-  final Object? error;
+  /// [error] holds the error value
+  final Object error;
 
-  /// [stackTrace] property stores object of the StackTrace? type.
+  /// [stackTrace] holds the stackTrace
   final StackTrace? stackTrace;
 
   @override
   bool get isError => true;
 
-  ResultError({this.error, this.stackTrace});
+  ResultError({required this.error, this.stackTrace});
 
   @override
   bool operator ==(Object other) =>
