@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:progress_dialog/flutter_progress_dialog.dart';
-import 'package:progress_dialog/src/result.dart';
+import 'package:flutter_future_progress_dialog/flutter_future_progress_dialog.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future _onIncrementCounter(BuildContext context) async {
+  Future<void> _onIncrementCounter(BuildContext context) async {
     final result = await showProgressDialog(
       context: context,
       future: () => myFuture(),
@@ -59,28 +58,29 @@ class _MyHomePageState extends State<MyHomePage> {
       case ResultOk<void>():
         break;
       case ResultError<void>(error: final error):
-        showDialog(
+        await showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-                content: Text(
-                  '$error',
-                  textAlign: TextAlign.center,
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      setState(() {
-                        _counter = 0;
-                        _yourFutureResult = '';
-                      });
-                    },
-                    child: const Text(
-                      'OK',
-                    ),
-                  )
-                ]);
+              content: Text(
+                '$error',
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _counter = 0;
+                      _yourFutureResult = '';
+                    });
+                  },
+                  child: const Text(
+                    'OK',
+                  ),
+                )
+              ],
+            );
           },
         );
     }
