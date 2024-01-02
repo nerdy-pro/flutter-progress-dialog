@@ -9,3 +9,7 @@
 ## 1.1.1
 
 * Fixed nullable values in result.
+
+## 1.2.0
+
+* Updated flutter version
