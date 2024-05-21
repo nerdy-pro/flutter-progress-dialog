@@ -45,6 +45,9 @@ class _CupertinoProgressBarDialog<T> extends State<CupertinoProgressBarDialog<T>
   @override
   Widget build(BuildContext context) {
     final builder = widget.builder;
+    if (builder != null) {
+      return builder(context);
+    }
     final textScaleFactor = MediaQuery.textScaleFactorOf(context);
     return CupertinoUserInterfaceLevel(
       data: CupertinoUserInterfaceLevelData.elevated,
@@ -70,10 +73,10 @@ class _CupertinoProgressBarDialog<T> extends State<CupertinoProgressBarDialog<T>
                     margin: const EdgeInsets.symmetric(vertical: _kDialogEdgePadding),
                     width: _kCupertinoProgressSize,
                     height: _kCupertinoProgressSize,
-                    child: CupertinoPopupSurface(
+                    child: const CupertinoPopupSurface(
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: builder != null ? builder(context) : const CupertinoActivityIndicator(),
+                        padding: EdgeInsets.all(16),
+                        child: CupertinoActivityIndicator(),
                       ),
                     ),
                   ),

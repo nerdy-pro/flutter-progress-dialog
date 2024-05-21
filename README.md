@@ -32,6 +32,8 @@ Here is a short example of `showProgressDialog` usage.
 Call the `showProgressDialog` inside your function. Pass `context` and `future` arguments. Then handle
 result.
 
+Alternatively you can use `showCupertinoProgressDialog` to show cupertino-styled dialog and `showAdaptiveProgressDialog` to show dialog matching host OS.
+
 ```dart
 
 Future<String> myFuture() async {
