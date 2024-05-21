@@ -1,4 +1,3 @@
-.fvm/flutter_sdk
 # Miscellaneous
 *.class
 *.log
@@ -30,3 +29,5 @@ migrate_working_dir/
 .packages
 build/
 
+# FVM Version Cache
+.fvm/
