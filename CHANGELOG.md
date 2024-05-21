@@ -19,3 +19,7 @@
 * Cupertino progress dialog
 * Adaptive progress dialog
 * Updated flutter version
+
+## 1.3.1
+
+* Updated docs
