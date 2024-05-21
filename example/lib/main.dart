@@ -21,6 +21,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+enum DialogType { material, cupertino }
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -33,19 +35,25 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  Future<int> myFuture() async {
+  Future<int> myFuture(int value) async {
     await Future.delayed(const Duration(seconds: 2));
-    if (_counter >= 3) {
+    if (value >= 3) {
       throw 'Something went wrong';
     }
-    return _counter + 1;
+    return value + 1;
   }
 
-  Future<void> _onIncrementCounter(BuildContext context) async {
-    final result = await showProgressDialog(
-      context: context,
-      future: () => myFuture(),
-    );
+  Future<void> _onIncrementCounter({required BuildContext context, required DialogType dialogType}) async {
+    final result = switch (dialogType) {
+      DialogType.cupertino => await showCupertinoProgressDialog(
+          context: context,
+          future: () => myFuture(_counter),
+        ),
+      DialogType.material => await showProgressDialog(
+          context: context,
+          future: () => myFuture(_counter),
+        ),
+    };
     if (!mounted) {
       return;
     }
@@ -94,24 +102,31 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Your Future will return result here',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
+            Text('Your Future will return result here', style: Theme.of(context).textTheme.bodyLarge),
             const SizedBox(height: 4),
-            Text(
-              '_counter: $_counter',
-              style: Theme.of(context).textTheme.headlineSmall,
+            Text('counter: $_counter', style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () => _onIncrementCounter(
+                    context: context,
+                    dialogType: DialogType.material,
+                  ),
+                  child: const Text('Material'),
+                ),
+                TextButton(
+                  onPressed: () => _onIncrementCounter(
+                    context: context,
+                    dialogType: DialogType.cupertino,
+                  ),
+                  child: const Text('Cupertino'),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _onIncrementCounter(context);
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
