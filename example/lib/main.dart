@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum DialogType { material, cupertino }
+enum DialogType { material, cupertino, adaptive }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -50,6 +50,10 @@ class _MyHomePageState extends State<MyHomePage> {
           future: () => myFuture(_counter),
         ),
       DialogType.material => await showProgressDialog(
+          context: context,
+          future: () => myFuture(_counter),
+        ),
+      DialogType.adaptive => await showAdaptiveProgressDialog(
           context: context,
           future: () => myFuture(_counter),
         ),
@@ -122,6 +126,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     dialogType: DialogType.cupertino,
                   ),
                   child: const Text('Cupertino'),
+                ),
+                TextButton(
+                  onPressed: () => _onIncrementCounter(
+                    context: context,
+                    dialogType: DialogType.adaptive,
+                  ),
+                  child: const Text('Adaptive'),
                 ),
               ],
             ),

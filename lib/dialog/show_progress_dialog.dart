@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart' as c;
 import 'package:flutter/material.dart' as m;
+import 'package:flutter/widgets.dart' as w;
 import 'package:flutter_future_progress_dialog/dialog/cupertino_progress_bar_dialog.dart';
 import 'package:flutter_future_progress_dialog/dialog/progress_bar_dialog.dart';
 import 'package:flutter_future_progress_dialog/dialog/result.dart';
@@ -52,4 +55,38 @@ ProgressDialogResult<T> showCupertinoProgressDialog<T>({
     barrierLabel: barrierLabel,
   );
   return result!;
+}
+
+ProgressDialogResult<T> showAdaptiveProgressDialog<T>({
+  required w.BuildContext context,
+  required ProgressDialogFuture<T> future,
+  w.WidgetBuilder? builder,
+  bool? useRootNavigator,
+  w.Offset? anchorPoint,
+  String? barrierLabel,
+  m.TraversalEdgeBehavior? traversalEdgeBehavior,
+  m.Color? barrierColor = m.Colors.black54,
+  bool useSafeArea = true,
+}) async {
+  if (Platform.isMacOS || Platform.isIOS) {
+    return await showCupertinoProgressDialog(
+      context: context,
+      future: future,
+      builder: builder,
+      useRootNavigator: useRootNavigator,
+      anchorPoint: anchorPoint,
+      barrierLabel: barrierLabel,
+    );
+  }
+  return await showProgressDialog(
+    context: context,
+    future: future,
+    builder: builder,
+    useRootNavigator: useRootNavigator,
+    anchorPoint: anchorPoint,
+    barrierLabel: barrierLabel,
+    traversalEdgeBehavior: traversalEdgeBehavior,
+    barrierColor: barrierColor,
+    useSafeArea: useSafeArea,
+  );
 }
