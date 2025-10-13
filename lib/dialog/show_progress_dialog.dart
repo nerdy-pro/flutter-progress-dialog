@@ -10,12 +10,16 @@ import 'package:flutter_future_progress_dialog/dialog/result.dart';
 
 typedef Task<T> = Future<T> Function();
 
-Future<void> _callback<T>(w.BuildContext context, Task<T> task) async {
+Future<void> _callback<T>(
+  w.BuildContext context,
+  Task<T> task,
+  w.Route<ProgressDialogResult<T>> route,
+) async {
   final result = await task.result();
   if (!context.mounted) {
     return;
   }
-  w.Navigator.of(context).pop(result);
+  w.Navigator.of(context).removeRoute(route, result);
 }
 
 /// Shows a progress dialog while executing a Future task.
@@ -48,27 +52,48 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
   required m.BuildContext context,
   required Task<T> future,
   m.WidgetBuilder? builder,
-  bool? useRootNavigator,
+  bool useRootNavigator = true,
   m.Offset? anchorPoint,
   String? barrierLabel,
+  bool? requestFocus,
   m.TraversalEdgeBehavior? traversalEdgeBehavior,
-  m.Color? barrierColor = m.Colors.black54,
+  m.Color? barrierColor,
   bool useSafeArea = true,
+  bool fullscreenDialog = false,
+  m.AnimationStyle? animationStyle,
 }) async {
-  final result = await m.showDialog<ProgressDialogResult<T>>(
-    barrierDismissible: false,
-    useRootNavigator: useRootNavigator ?? true,
+  final themes = m.InheritedTheme.capture(
+    from: context,
+    to: m.Navigator.of(context, rootNavigator: useRootNavigator).context,
+  );
+
+  late final m.Route<ProgressDialogResult<T>> route;
+
+  route = m.DialogRoute<ProgressDialogResult<T>>(
     context: context,
     builder: (context) => ExactlyOnce(
-      callback: () => _callback(context, future),
+      callback: () => _callback(context, future, route),
       child: builder?.call(context) ?? const ProgressBarDialog(),
     ),
-    anchorPoint: anchorPoint,
+    barrierColor: barrierColor ??
+        m.DialogTheme.of(context).barrierColor ??
+        m.Theme.of(context).dialogTheme.barrierColor ??
+        m.Colors.black54,
+    barrierDismissible: false,
     barrierLabel: barrierLabel,
-    traversalEdgeBehavior: traversalEdgeBehavior,
-    barrierColor: barrierColor,
     useSafeArea: useSafeArea,
+    themes: themes,
+    anchorPoint: anchorPoint,
+    traversalEdgeBehavior:
+        traversalEdgeBehavior ?? m.TraversalEdgeBehavior.closedLoop,
+    requestFocus: requestFocus,
+    animationStyle: animationStyle,
+    fullscreenDialog: fullscreenDialog,
   );
+
+  final result = await m.Navigator.of(context, rootNavigator: useRootNavigator)
+      .push<ProgressDialogResult<T>>(route);
+
   return result!;
 }
 
@@ -91,21 +116,28 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
   required c.BuildContext context,
   required Task<T> future,
   c.WidgetBuilder? builder,
-  bool? useRootNavigator,
   c.Offset? anchorPoint,
   String? barrierLabel,
+  bool useRootNavigator = true,
+  c.Color? barrierColor,
+  bool? requestFocus,
 }) async {
-  final result = await c.showCupertinoDialog<ProgressDialogResult<T>>(
-    barrierDismissible: false,
-    context: context,
+  late final c.CupertinoDialogRoute<ProgressDialogResult<T>> route;
+
+  route = c.CupertinoDialogRoute<ProgressDialogResult<T>>(
     builder: (context) => ExactlyOnce(
-      callback: () => _callback(context, future),
+      callback: () => _callback(context, future, route),
       child: builder?.call(context) ?? const CupertinoProgressBarDialog(),
     ),
-    useRootNavigator: useRootNavigator ?? true,
-    anchorPoint: anchorPoint,
+    context: context,
+    barrierDismissible: false,
     barrierLabel: barrierLabel,
+    barrierColor: barrierColor,
+    anchorPoint: anchorPoint,
+    requestFocus: requestFocus,
   );
+  final result = await c.Navigator.of(context, rootNavigator: useRootNavigator)
+      .push<ProgressDialogResult<T>>(route);
   return result!;
 }
 
@@ -132,12 +164,13 @@ Future<ProgressDialogResult<T>> showAdaptiveProgressDialog<T>({
   required w.BuildContext context,
   required Task<T> future,
   w.WidgetBuilder? builder,
-  bool? useRootNavigator,
+  bool useRootNavigator = true,
   w.Offset? anchorPoint,
   String? barrierLabel,
   m.TraversalEdgeBehavior? traversalEdgeBehavior,
-  m.Color? barrierColor = m.Colors.black54,
+  w.Color? barrierColor,
   bool useSafeArea = true,
+  bool? requestFocus,
 }) async {
   if (Platform.isMacOS || Platform.isIOS) {
     return await showCupertinoProgressDialog(
@@ -147,6 +180,7 @@ Future<ProgressDialogResult<T>> showAdaptiveProgressDialog<T>({
       useRootNavigator: useRootNavigator,
       anchorPoint: anchorPoint,
       barrierLabel: barrierLabel,
+      requestFocus: requestFocus,
     );
   }
   return await showProgressDialog(
@@ -159,6 +193,7 @@ Future<ProgressDialogResult<T>> showAdaptiveProgressDialog<T>({
     traversalEdgeBehavior: traversalEdgeBehavior,
     barrierColor: barrierColor,
     useSafeArea: useSafeArea,
+    requestFocus: requestFocus,
   );
 }
 
