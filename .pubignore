@@ -8,5 +8,4 @@ pubspec.lock
 .android/
 .ios/
 img
-example
 build

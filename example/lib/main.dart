@@ -22,7 +22,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum DialogType { material, cupertino, adaptive, customMaterial, customCupertino }
+enum DialogType {
+  material,
+  cupertino,
+  adaptive,
+  customMaterial,
+  customCupertino
+}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -44,7 +50,38 @@ class _MyHomePageState extends State<MyHomePage> {
     return value + 1;
   }
 
-  Future<void> _onIncrementCounter({required BuildContext context, required DialogType dialogType}) async {
+  Future<void> _showError({
+    required BuildContext context,
+    required String error,
+  }) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(
+            error,
+            textAlign: TextAlign.center,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  _counter = 0;
+                });
+              },
+              child: const Text('OK'),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _onIncrementCounter({
+    required BuildContext context,
+    required DialogType dialogType,
+  }) async {
     final future = switch (dialogType) {
       DialogType.cupertino => showCupertinoProgressDialog(
           context: context,
@@ -70,7 +107,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       DialogType.customCupertino => showCupertinoProgressDialog(
           context: context,
-          builder: (context) => const cupertino.CupertinoAlertDialog(content: cupertino.Text('Loading...')),
+          builder: (context) => const cupertino.CupertinoAlertDialog(
+            content: cupertino.Text('Loading...'),
+          ),
           future: () => myFuture(_counter),
         ),
     };
@@ -85,28 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
         break;
       case Failure(error: final error):
-        await showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              content: Text(
-                '$error',
-                textAlign: TextAlign.center,
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    setState(() {
-                      _counter = 0;
-                    });
-                  },
-                  child: const Text('OK'),
-                )
-              ],
-            );
-          },
-        );
+        _showError(context: context, error: error.toString()).ignore();
     }
   }
 
@@ -121,9 +139,15 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Your Future will return result here', style: Theme.of(context).textTheme.bodyLarge),
+            Text(
+              'Your Future will return result here',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
             const SizedBox(height: 4),
-            Text('counter: $_counter', style: Theme.of(context).textTheme.headlineSmall),
+            Text(
+              'counter: $_counter',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
             const SizedBox(height: 16),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
