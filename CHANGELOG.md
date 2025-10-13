@@ -28,3 +28,7 @@
 
 * Fixed deprecation warnings
 * Fixed image in readme file
+
+## 1.4.0
+
+* Changed signatures of classes to avoid interfering with other packages
