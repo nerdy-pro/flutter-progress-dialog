@@ -1,6 +1,6 @@
-.fvm
+.fvm/
 .fvmrc
-.idea
+.idea/
 .dart_tool/
 .packages
 pubspec.lock

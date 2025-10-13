@@ -31,3 +31,9 @@ build/
 
 # FVM Version Cache
 .fvm/
+
+
+# Exceptions for tracked files
+!.fvm/fvm_config.json
+!.idea/codeStyles/Project.xml
+!.idea/codeStyles/codeStyleConfig.xml
