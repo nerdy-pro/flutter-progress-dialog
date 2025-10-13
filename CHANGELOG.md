@@ -23,3 +23,8 @@
 ## 1.3.1
 
 * Updated docs
+
+## 1.3.2
+
+* Fixed deprecation warnings
+* Fixed image in readme file
