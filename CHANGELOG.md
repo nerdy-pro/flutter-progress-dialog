@@ -32,3 +32,8 @@
 ## 1.4.0
 
 * Changed signatures of classes to avoid interfering with other packages
+
+## 1.4.1
+
+* Included examples in pub.dev
+* Improved code documentation
