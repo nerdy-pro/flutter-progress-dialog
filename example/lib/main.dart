@@ -45,20 +45,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _onIncrementCounter({required BuildContext context, required DialogType dialogType}) async {
-    final result = switch (dialogType) {
-      DialogType.cupertino => await showCupertinoProgressDialog(
+    final future = switch (dialogType) {
+      DialogType.cupertino => showCupertinoProgressDialog(
           context: context,
           future: () => myFuture(_counter),
         ),
-      DialogType.material => await showProgressDialog(
+      DialogType.material => showProgressDialog(
           context: context,
           future: () => myFuture(_counter),
         ),
-      DialogType.adaptive => await showAdaptiveProgressDialog(
+      DialogType.adaptive => showAdaptiveProgressDialog(
           context: context,
           future: () => myFuture(_counter),
         ),
-      DialogType.customMaterial => await showProgressDialog(
+      DialogType.customMaterial => showProgressDialog(
           context: context,
           builder: (context) => const Dialog(
             child: cupertino.Padding(
@@ -68,12 +68,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           future: () => myFuture(_counter),
         ),
-      DialogType.customCupertino => await showCupertinoProgressDialog(
+      DialogType.customCupertino => showCupertinoProgressDialog(
           context: context,
           builder: (context) => const cupertino.CupertinoAlertDialog(content: cupertino.Text('Loading...')),
           future: () => myFuture(_counter),
         ),
     };
+    final result = await future;
     if (!context.mounted) {
       return;
     }
