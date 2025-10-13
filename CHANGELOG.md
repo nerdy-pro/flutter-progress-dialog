@@ -37,3 +37,7 @@
 
 * Included examples in pub.dev
 * Improved code documentation
+
+## 1.4.2
+
+* Avoid using `Navigator.pop()` when closing progress dialog
