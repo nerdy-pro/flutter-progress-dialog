@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_future_progress_dialog/dialog/result.dart';
 
@@ -48,13 +46,11 @@ class _CupertinoProgressBarDialog<T> extends State<CupertinoProgressBarDialog<T>
     if (builder != null) {
       return builder(context);
     }
-    final textScaleFactor = MediaQuery.textScaleFactorOf(context);
     return CupertinoUserInterfaceLevel(
       data: CupertinoUserInterfaceLevelData.elevated,
       child: MediaQuery(
         data: MediaQuery.of(context).copyWith(
-          // iOS does not shrink dialog content below a 1.0 scale factor
-          textScaleFactor: max(textScaleFactor, 1.0),
+          textScaler: TextScaler.noScaling,
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
