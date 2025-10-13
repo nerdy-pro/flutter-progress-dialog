@@ -1,48 +1,12 @@
 name: Publish to pub.dev
 
 on:
-  release:
-    types: [ published ]
+  workflow_dispatch:
 
 jobs:
-  verify:
-    name: Verify version match
-    runs-on: ubuntu-latest
-    outputs:
-      version_matches: ${{ steps.check_version.outputs.version_matches }}
-      package_version: ${{ steps.extract_version.outputs.version }}
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Extract version from pubspec.yaml
-        id: extract_version
-        run: |
-          VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //')
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "Package version from pubspec.yaml: ${VERSION}"
-
-      - name: Check if release tag matches pubspec version
-        id: check_version
-        run: |
-          TAG_VERSION=${{ github.event.release.tag_name }}
-          TAG_VERSION=${TAG_VERSION#v}  # Remove 'v' prefix if present
-          PUBSPEC_VERSION=${{ steps.extract_version.outputs.version }}
-          
-          echo "Release tag: ${TAG_VERSION}"
-          echo "Package version: ${PUBSPEC_VERSION}"
-          
-          if [ "$TAG_VERSION" == "$PUBSPEC_VERSION" ]; then
-            echo "✅ Versions match!"
-            echo "version_matches=true" >> $GITHUB_OUTPUT
-          else
-            echo "❌ Version mismatch!"
-            echo "version_matches=false" >> $GITHUB_OUTPUT
-          fi
 
   test:
     name: Run tests
-    needs: verify
-    if: ${{ needs.verify.outputs.version_matches == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -58,27 +22,9 @@ jobs:
       - name: Run tests
         run: flutter test
 
-  dry_run:
-    name: Publish dry run
-    needs: [ verify, test ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Pub.dev publish dry run
-        run: flutter pub publish --dry-run
-
   publish:
     name: Publish to pub.dev
-    needs: [ verify, test, dry_run ]
+    needs: [ test ]
     permissions:
       id-token: write # Required for authentication using OIDC
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
