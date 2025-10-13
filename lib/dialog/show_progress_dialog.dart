@@ -18,9 +18,32 @@ Future<void> _callback<T>(w.BuildContext context, Task<T> task) async {
   w.Navigator.of(context).pop(result);
 }
 
-/// Function takes the `context`, the `useRootNavigator` and the `future` arguments.
-/// Optionally you can provide a custom [builder] which will be used instead of the default [Dialog].
-/// The result would hold the value of the future or the error if the future evaluation failed.
+/// Shows a progress dialog while executing a Future task.
+///
+/// This function displays a modal progress dialog that remains visible until the provided
+/// [future] completes. The dialog can be customized using the [builder] parameter.
+///
+/// Parameters:
+/// * [context] - The build context used to show the dialog
+/// * [future] - The async task to execute while showing the progress dialog
+/// * [builder] - Optional custom widget builder for the progress dialog UI
+/// * [useRootNavigator] - Whether to show dialog above all screens, defaults to true
+/// * [anchorPoint] - Optional anchor point for the dialog position
+/// * [barrierLabel] - Semantic label used for the modal barrier
+/// * [traversalEdgeBehavior] - Determines dialog edge behavior when using keyboard traversal
+/// * [barrierColor] - Color of the modal barrier, defaults to black54
+/// * [useSafeArea] - Whether to respect system UI safe areas, defaults to true
+///
+/// Returns a [ProgressDialogResult] containing either the successful result value
+/// or error details if the future fails.
+///
+/// Example:
+/// ```dart
+/// final result = await showProgressDialog(
+///   context: context,
+///   future: () => myAsyncTask(),
+/// );
+/// ```
 Future<ProgressDialogResult<T>> showProgressDialog<T>({
   required m.BuildContext context,
   required Task<T> future,
@@ -49,6 +72,21 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
   return result!;
 }
 
+/// Shows a Cupertino-styled progress dialog while executing a Future task.
+///
+/// This function displays a modal progress dialog with iOS-style appearance that
+/// remains visible until the provided [future] completes.
+///
+/// Parameters:
+/// * [context] - The build context used to show the dialog
+/// * [future] - The async task to execute while showing the progress dialog
+/// * [builder] - Optional custom widget builder for the progress dialog UI
+/// * [useRootNavigator] - Whether to show dialog above all screens, defaults to true
+/// * [anchorPoint] - Optional anchor point for the dialog position
+/// * [barrierLabel] - Semantic label used for the modal barrier
+///
+/// Returns a [ProgressDialogResult] containing either the successful result value
+/// or error details if the future fails.
 Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
   required c.BuildContext context,
   required Task<T> future,
@@ -71,6 +109,25 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
   return result!;
 }
 
+/// Shows a platform-adaptive progress dialog while executing a Future task.
+///
+/// This function displays a modal progress dialog that matches the host platform's style.
+/// On iOS and macOS it shows a Cupertino-styled dialog, while on other platforms it
+/// shows the Material-styled dialog.
+///
+/// Parameters:
+/// * [context] - The build context used to show the dialog
+/// * [future] - The async task to execute while showing the progress dialog
+/// * [builder] - Optional custom widget builder for the progress dialog UI
+/// * [useRootNavigator] - Whether to show dialog above all screens, defaults to true
+/// * [anchorPoint] - Optional anchor point for the dialog position
+/// * [barrierLabel] - Semantic label used for the modal barrier
+/// * [traversalEdgeBehavior] - Determines dialog edge behavior when using keyboard traversal
+/// * [barrierColor] - Color of the modal barrier, defaults to black54
+/// * [useSafeArea] - Whether to respect system UI safe areas, defaults to true
+///
+/// Returns a [ProgressDialogResult] containing either the successful result value
+/// or error details if the future fails.
 Future<ProgressDialogResult<T>> showAdaptiveProgressDialog<T>({
   required w.BuildContext context,
   required Task<T> future,
