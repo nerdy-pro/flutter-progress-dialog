@@ -1,10 +1,18 @@
 ## flutter_future_progress_dialog
-![Pub Version](https://img.shields.io/pub/v/flutter_future_progress_dialog)
+
+[![Pub Version](https://img.shields.io/pub/v/flutter_future_progress_dialog)](https://pub.dev/packages/flutter_future_progress_dialog)
 ![GitHub](https://img.shields.io/github/license/nerdy-pro/flutter-progress-dialog)
 
 Show progress dialog with animation while waiting for Future completion and then return the result of that Future.
 
 ## Features
+
+- Show progress dialog while Future is running
+- Material and Cupertino style dialogs
+- Adaptive dialog that matches platform style
+- Custom dialog builder support
+- Type-safe result handling
+- Error handling with stack traces
 
 ![Iphone 15](https://raw.githubusercontent.com/nerdy-pro/flutter-progress-dialog/main/img/flutter_progress_dialog_1_4_0.gif)
 
@@ -25,7 +33,15 @@ import 'package:flutter_future_progress_dialog/flutter_future_progress_dialog.da
 
 ## Usage
 
-Working example can be found in [/example](https://github.com/nerdy-pro/flutter-progress-dialog/tree/develop/example) directory.
+A complete working example can be found in
+the [example directory](https://github.com/nerdy-pro/flutter-progress-dialog/tree/develop/example).
+
+The dialog returns a `ProgressDialogResult<T>` type that can be either:
+
+- `Success<T>` containing the successful result value
+- `Failure` containing the error and stack trace
+
+You can handle both cases using pattern matching:
 
 Here is a short example of `showProgressDialog` usage.
 
@@ -50,7 +66,7 @@ Future<void> yourFunction(BuildContext context) async {
     return;
   }
   switch (result) {
-    case ResultError(error: final error):
+    case Failure(:final error):
       await showDialog(
         context: context,
         builder: (context) {
@@ -72,7 +88,7 @@ Future<void> yourFunction(BuildContext context) async {
           );
         },
       );
-    case ResultOk<String>(value: final value):
+    case Success<String>(:final value):
       // value variable would hold the 'my string' value here 
       break;
   } 
@@ -82,7 +98,7 @@ Future<void> yourFunction(BuildContext context) async {
 Optionally you can pass a `builder` to have a custom progress dialog
 
 ```dart
-Future<Result<LongRunningTaskResult>> buttonCallback({
+Future<ProgressDialogResult<LongRunningTaskResult>> buttonCallback({
   required BuildContext context,
 }) async {
   return await showProgressDialog(
