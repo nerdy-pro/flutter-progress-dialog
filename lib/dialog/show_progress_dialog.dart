@@ -34,9 +34,12 @@ Future<void> _callback<T>(
 /// * [useRootNavigator] - Whether to show dialog above all screens, defaults to true
 /// * [anchorPoint] - Optional anchor point for the dialog position
 /// * [barrierLabel] - Semantic label used for the modal barrier
+/// * [requestFocus] - Whether the dialog should request focus when opened
 /// * [traversalEdgeBehavior] - Determines dialog edge behavior when using keyboard traversal
 /// * [barrierColor] - Color of the modal barrier, defaults to black54
 /// * [useSafeArea] - Whether to respect system UI safe areas, defaults to true
+/// * [fullscreenDialog] - Whether this dialog is a fullscreen dialog
+/// * [animationStyle] - Style of the dialog animation
 ///
 /// Returns a [ProgressDialogResult] containing either the successful result value
 /// or error details if the future fails.
@@ -47,6 +50,15 @@ Future<void> _callback<T>(
 ///   context: context,
 ///   future: () => myAsyncTask(),
 /// );
+///
+/// switch (result) {
+///   case Success(value: final value):
+///     print('Task completed successfully: $value');
+///     break;
+///   case Failure(error: final error):
+///     print('Task failed: $error');
+///     break;
+/// }
 /// ```
 Future<ProgressDialogResult<T>> showProgressDialog<T>({
   required m.BuildContext context,
@@ -109,9 +121,28 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
 /// * [useRootNavigator] - Whether to show dialog above all screens, defaults to true
 /// * [anchorPoint] - Optional anchor point for the dialog position
 /// * [barrierLabel] - Semantic label used for the modal barrier
+/// * [barrierColor] - Color of the modal barrier behind the dialog
+/// * [requestFocus] - Whether the dialog should request focus when opened
 ///
 /// Returns a [ProgressDialogResult] containing either the successful result value
 /// or error details if the future fails.
+///
+/// Example:
+/// ```dart
+/// final result = await showCupertinoProgressDialog(
+///   context: context,
+///   future: () => myAsyncTask(),
+/// );
+///
+/// switch (result) {
+///   case Success(value: final value):
+///     print('Task completed successfully: $value');
+///     break;
+///   case Failure(error: final error):
+///     print('Task failed: $error');
+///     break;
+/// }
+/// ```
 Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
   required c.BuildContext context,
   required Task<T> future,
@@ -157,9 +188,27 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
 /// * [traversalEdgeBehavior] - Determines dialog edge behavior when using keyboard traversal
 /// * [barrierColor] - Color of the modal barrier, defaults to black54
 /// * [useSafeArea] - Whether to respect system UI safe areas, defaults to true
+/// * [requestFocus] - Whether the dialog should request focus when opened
 ///
 /// Returns a [ProgressDialogResult] containing either the successful result value
 /// or error details if the future fails.
+///
+/// Example:
+/// ```dart
+/// final result = await showAdaptiveProgressDialog(
+///   context: context,
+///   future: () => myAsyncTask(),
+/// );
+///
+/// switch (result) {
+///   case Success(value: final value):
+///     print('Task completed successfully: $value');
+///     break;
+///   case Failure(error: final error):
+///     print('Task failed: $error');
+///     break;
+/// }
+/// ```
 Future<ProgressDialogResult<T>> showAdaptiveProgressDialog<T>({
   required w.BuildContext context,
   required Task<T> future,
