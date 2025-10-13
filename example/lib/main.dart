@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' as cupertino;
 import 'package:flutter/material.dart';
 import 'package:flutter_future_progress_dialog/flutter_future_progress_dialog.dart';
 
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum DialogType { material, cupertino, adaptive }
+enum DialogType { material, cupertino, adaptive, customMaterial, customCupertino }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -36,8 +37,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   Future<int> myFuture(int value) async {
-    await Future.delayed(const Duration(seconds: 2));
-    if (value >= 3) {
+    await Future.delayed(const Duration(seconds: 1));
+    if (value >= 5) {
       throw 'Something went wrong';
     }
     return value + 1;
@@ -55,6 +56,21 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       DialogType.adaptive => await showAdaptiveProgressDialog(
           context: context,
+          future: () => myFuture(_counter),
+        ),
+      DialogType.customMaterial => await showProgressDialog(
+          context: context,
+          builder: (context) => const Dialog(
+            child: cupertino.Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text('Loading...'),
+            ),
+          ),
+          future: () => myFuture(_counter),
+        ),
+      DialogType.customCupertino => await showCupertinoProgressDialog(
+          context: context,
+          builder: (context) => const cupertino.CupertinoAlertDialog(content: cupertino.Text('Loading...')),
           future: () => myFuture(_counter),
         ),
     };
@@ -84,9 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       _counter = 0;
                     });
                   },
-                  child: const Text(
-                    'OK',
-                  ),
+                  child: const Text('OK'),
                 )
               ],
             );
@@ -110,8 +124,9 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 4),
             Text('counter: $_counter', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 16),
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 4,
               children: [
                 TextButton(
                   onPressed: () => _onIncrementCounter(
@@ -133,6 +148,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     dialogType: DialogType.adaptive,
                   ),
                   child: const Text('Adaptive'),
+                ),
+                TextButton(
+                  onPressed: () => _onIncrementCounter(
+                    context: context,
+                    dialogType: DialogType.customMaterial,
+                  ),
+                  child: const Text('Custom Material'),
+                ),
+                TextButton(
+                  onPressed: () => _onIncrementCounter(
+                    context: context,
+                    dialogType: DialogType.customCupertino,
+                  ),
+                  child: const Text('Custom cupertino'),
                 ),
               ],
             ),
