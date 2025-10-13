@@ -27,7 +27,7 @@ class _ExactlyOnceState extends State<ExactlyOnce> {
       if (_completer.isCompleted) {
         return;
       }
-      _completer.complete(context);
+      _completer.complete();
     });
     return widget.child;
   }

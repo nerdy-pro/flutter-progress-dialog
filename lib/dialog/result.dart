@@ -33,7 +33,7 @@ sealed class ProgressDialogResult<T> {
   T unwrap() {
     return switch (this) {
       Success(:final value) => value,
-      Failure(:final error, :final stackTrace) => throw error,
+      Failure(:final error) => throw error,
     };
   }
 
