@@ -1,52 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_future_progress_dialog/dialog/result.dart';
 
-/// Widget displays the [Dialog] white the provided [future] is being evaluated.
-/// Optionally you can provide a custom [builder] which will be used instead of the default [Dialog].
-class ProgressBarDialog<T> extends StatefulWidget {
-  final Future<T> Function() future;
-  final WidgetBuilder? builder;
-
-  const ProgressBarDialog({super.key, required this.future, this.builder});
+/// A widget that displays a circular progress indicator inside a [Dialog].
+///
+/// This widget is used internally by [showProgressDialog], [showCupertinoProgressDialog],
+/// and [showAdaptiveProgressDialog] to show a loading state while a future task is being executed.
+///
+/// The dialog contains a centered [CircularProgressIndicator] with fixed dimensions
+/// and padding. The generic type [T] corresponds to the type of data being processed.
+class ProgressBarDialog extends StatefulWidget {
+  /// Creates a progress bar dialog.
+  ///
+  /// The [key] parameter is optional and is used to control how one widget replaces
+  /// another widget in the tree.
+  const ProgressBarDialog({super.key});
 
   @override
-  State<StatefulWidget> createState() => _ProgressBarDialogState<T>();
+  State<StatefulWidget> createState() => _ProgressBarDialogState();
 }
 
-class _ProgressBarDialogState<T> extends State<ProgressBarDialog<T>> {
-  Future<void> _evaluateFuture() async {
-    final result = await Result.runCatchingFuture(() async {
-      return await widget.future();
-    });
-    if (mounted) {
-      Navigator.of(context).pop(result);
-    }
-  }
-
-  @override
-  void initState() {
-    _evaluateFuture().ignore();
-    super.initState();
-  }
-
+/// State class for [ProgressBarDialog] that manages the dialog's visual representation.
+///
+/// This class builds a simple dialog containing a centered circular progress indicator
+/// with fixed dimensions and padding.
+class _ProgressBarDialogState extends State<ProgressBarDialog> {
+  /// Builds the dialog widget with a centered circular progress indicator.
+  ///
+  /// @param context The build context for this widget.
+  /// @return A [Dialog] widget containing a padded circular progress indicator.
   @override
   Widget build(BuildContext context) {
-    final builder = widget.builder;
-    if (builder != null) {
-      return builder(context);
-    } else {
-      return const Dialog(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: SizedBox(
-            height: 40,
-            width: 40,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
+    return const Dialog(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: SizedBox(
+          height: 40,
+          width: 40,
+          child: Center(
+            child: CircularProgressIndicator(),
           ),
         ),
-      );
-    }
+      ),
+    );
   }
 }

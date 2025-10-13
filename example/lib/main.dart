@@ -58,16 +58,16 @@ class _MyHomePageState extends State<MyHomePage> {
           future: () => myFuture(_counter),
         ),
     };
-    if (!mounted) {
+    if (!context.mounted) {
       return;
     }
     switch (result) {
-      case ResultOk<int>(value: final value):
+      case Success<int>(value: final value):
         setState(() {
           _counter = value;
         });
         break;
-      case ResultError(error: final error):
+      case Failure(error: final error):
         await showDialog(
           context: context,
           builder: (context) {

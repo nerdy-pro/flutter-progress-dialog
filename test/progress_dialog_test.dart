@@ -6,9 +6,8 @@ import 'package:flutter_future_progress_dialog/flutter_future_progress_dialog.da
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('showProgressDialog completes with some value',
-      (WidgetTester tester) async {
-    final completer = Completer<Result<String>?>();
+  testWidgets('showProgressDialog completes with some value', (WidgetTester tester) async {
+    final completer = Completer<ProgressDialogResult<String>?>();
     dialogTest(BuildContext context) async {
       final result = await showProgressDialog(
         context: context,
@@ -38,14 +37,12 @@ void main() {
     );
     await tester.pumpAndSettle();
     final result = await completer.future;
-    expect(result.runtimeType, ResultOk<String>);
-    result as ResultOk<String>;
-    expect(result.value, 'ok');
+    expect(result.runtimeType, Success<String>);
+    expect((result as Success<String>).value, 'ok');
   });
 
-  testWidgets('showProgressDialog completes with some error',
-      (WidgetTester tester) async {
-    final completer = Completer<Result<String>?>();
+  testWidgets('showProgressDialog completes with some error', (WidgetTester tester) async {
+    final completer = Completer<ProgressDialogResult<String>?>();
     dialogTest(BuildContext context) async {
       final result = await showProgressDialog(
         context: context,
@@ -76,8 +73,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     final result = await completer.future;
-    expect(result.runtimeType, ResultError<String>);
-    result as ResultError<String>;
-    expect(result.error, 'error');
+    expect(result.runtimeType, Failure<String>);
+    expect((result as Failure<String>).error, 'error');
   });
 }

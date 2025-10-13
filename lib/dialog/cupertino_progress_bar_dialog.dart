@@ -1,51 +1,27 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_future_progress_dialog/dialog/result.dart';
 
 const double _kDialogEdgePadding = 20.0;
 const double _kCupertinoProgressSize = 60.0;
 
 /// Widget displays the [Dialog] white the provided [future] is being evaluated.
 /// Optionally you can provide a custom [builder] which will be used instead of the default [Dialog].
-class CupertinoProgressBarDialog<T> extends StatefulWidget {
-  final Future<T> Function() future;
-  final WidgetBuilder? builder;
+class CupertinoProgressBarDialog extends StatefulWidget {
   final Duration insetAnimationDuration;
   final Curve insetAnimationCurve;
 
   const CupertinoProgressBarDialog({
     super.key,
-    required this.future,
-    this.builder,
     this.insetAnimationDuration = const Duration(milliseconds: 100),
     this.insetAnimationCurve = Curves.decelerate,
   });
 
   @override
-  State<StatefulWidget> createState() => _CupertinoProgressBarDialog<T>();
+  State<StatefulWidget> createState() => _CupertinoProgressBarDialog();
 }
 
-class _CupertinoProgressBarDialog<T> extends State<CupertinoProgressBarDialog<T>> {
-  Future<void> _evaluateFuture() async {
-    final result = await Result.runCatchingFuture(() async {
-      return await widget.future();
-    });
-    if (mounted) {
-      Navigator.of(context).pop(result);
-    }
-  }
-
-  @override
-  void initState() {
-    _evaluateFuture().ignore();
-    super.initState();
-  }
-
+class _CupertinoProgressBarDialog extends State<CupertinoProgressBarDialog> {
   @override
   Widget build(BuildContext context) {
-    final builder = widget.builder;
-    if (builder != null) {
-      return builder(context);
-    }
     return CupertinoUserInterfaceLevel(
       data: CupertinoUserInterfaceLevelData.elevated,
       child: MediaQuery(
