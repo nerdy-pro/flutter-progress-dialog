@@ -1,7 +1,19 @@
 name: flutter_future_progress_dialog
-description: Allows to display progress dialog while the Future function is evaluated.
-version: 1.4.2
-homepage: https://github.com/nerdy-pro/flutter-progress-dialog
+description: Show a progress dialog while a Future runs and return the result. Supports Material, Cupertino, and adaptive styles with type-safe error handling.
+version: 1.5.0
+repository: https://github.com/nerdy-pro/flutter-progress-dialog
+issue_tracker: https://github.com/nerdy-pro/flutter-progress-dialog/issues
+
+topics:
+  - dialog
+  - progress
+  - async
+  - cupertino
+  - loading
+
+screenshots:
+  - description: Progress dialog demo showing Material, Cupertino, custom, and failure variants.
+    path: img/flutter_progress_dialog.gif
 
 environment:
   sdk: ^3.0.0
