@@ -1,8 +1,6 @@
-/// This class is used to wrap the result of asynchronous operations shown in progress dialogs.
-/// It can either be a [Success] containing the operation's result value, or a [Failure]
-/// containing error details if the operation failed.
+/// The result of an asynchronous operation shown in a progress dialog.
 ///
-/// The type parameter [T] represents the type of value that will be returned in case of success.
+/// Either a [Success] containing the value, or a [Failure] containing the error.
 ///
 /// Example usage:
 /// ```dart
@@ -54,9 +52,8 @@ sealed class ProgressDialogResult<T> {
   }
 }
 
-/// Creates the Result object with [value] containing some value.
+/// A successful result containing the [value] returned by the task.
 class Success<T> extends ProgressDialogResult<T> {
-  /// [value] property holds the value returned by the Future.
   final T value;
 
   @override
@@ -72,12 +69,9 @@ class Success<T> extends ProgressDialogResult<T> {
   int get hashCode => value.hashCode;
 }
 
-/// Creates the Result object with [error] and [stackTrace] containing error object and stackTrace object respectively.
+/// A failed result containing the [error] and optional [stackTrace].
 class Failure<T> extends ProgressDialogResult<T> {
-  /// [error] holds the error value
   final Object error;
-
-  /// [stackTrace] holds the stackTrace
   final StackTrace? stackTrace;
 
   @override

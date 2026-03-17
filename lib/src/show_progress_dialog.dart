@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart' as c;
 import 'package:flutter/material.dart' as m;
 import 'package:flutter/widgets.dart' as w;
-import 'package:flutter_future_progress_dialog/dialog/cupertino_progress_bar_dialog.dart';
-import 'package:flutter_future_progress_dialog/dialog/exactly_once.dart';
-import 'package:flutter_future_progress_dialog/dialog/progress_bar_dialog.dart';
-import 'package:flutter_future_progress_dialog/dialog/result.dart';
+import 'package:flutter_future_progress_dialog/src/cupertino_progress_bar_dialog.dart';
+import 'package:flutter_future_progress_dialog/src/exactly_once.dart';
+import 'package:flutter_future_progress_dialog/src/progress_bar_dialog.dart';
+import 'package:flutter_future_progress_dialog/src/result.dart';
 
 typedef Task<T> = Future<T> Function();
 
@@ -22,10 +22,10 @@ Future<void> _callback<T>(
   navigator.removeRoute(route, result);
 }
 
-/// Shows a progress dialog while executing a Future task.
+/// Shows a progress dialog while executing an asynchronous task.
 ///
-/// This function displays a modal progress dialog that remains visible until the provided
-/// [future] completes. The dialog can be customized using the [builder] parameter.
+/// Displays a modal progress dialog that remains visible until [future] completes.
+/// The dialog UI can be customized using the [builder] parameter.
 ///
 /// Parameters:
 /// * [context] - The build context used to show the dialog
@@ -110,10 +110,10 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
   return result!;
 }
 
-/// Shows a Cupertino-styled progress dialog while executing a Future task.
+/// Shows a Cupertino-styled progress dialog while executing an asynchronous task.
 ///
-/// This function displays a modal progress dialog with iOS-style appearance that
-/// remains visible until the provided [future] completes.
+/// Displays a modal progress dialog with iOS-style appearance that
+/// remains visible until [future] completes.
 ///
 /// Parameters:
 /// * [context] - The build context used to show the dialog
@@ -174,11 +174,10 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
   return result!;
 }
 
-/// Shows a platform-adaptive progress dialog while executing a Future task.
+/// Shows a platform-adaptive progress dialog while executing an asynchronous task.
 ///
-/// This function displays a modal progress dialog that matches the host platform's style.
-/// On iOS and macOS it shows a Cupertino-styled dialog, while on other platforms it
-/// shows the Material-styled dialog.
+/// Displays a Cupertino-styled dialog on iOS and macOS, and a Material-styled
+/// dialog on all other platforms.
 ///
 /// Parameters:
 /// * [context] - The build context used to show the dialog
