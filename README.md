@@ -7,7 +7,7 @@ A Flutter package that displays a progress dialog while an asynchronous task is 
 
 Developed and maintained by [Nerdy Pro](https://nerdy.pro).
 
-![Flutter progress dialog demo on iPhone](https://raw.githubusercontent.com/nerdy-pro/flutter-progress-dialog/main/img/flutter_progress_dialog_1_4_0.gif)
+![Flutter progress dialog demo on iPhone](https://raw.githubusercontent.com/nerdy-pro/flutter-progress-dialog/main/img/flutter_progress_dialog.gif)
 
 ## Features
 
