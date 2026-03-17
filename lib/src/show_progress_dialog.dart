@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart' as c;
 import 'package:flutter/material.dart' as m;
 import 'package:flutter/widgets.dart' as w;
-import 'package:flutter_future_progress_dialog/dialog/cupertino_progress_bar_dialog.dart';
-import 'package:flutter_future_progress_dialog/dialog/exactly_once.dart';
-import 'package:flutter_future_progress_dialog/dialog/progress_bar_dialog.dart';
-import 'package:flutter_future_progress_dialog/dialog/result.dart';
+import 'package:flutter_future_progress_dialog/src/cupertino_progress_bar_dialog.dart';
+import 'package:flutter_future_progress_dialog/src/exactly_once.dart';
+import 'package:flutter_future_progress_dialog/src/progress_bar_dialog.dart';
+import 'package:flutter_future_progress_dialog/src/result.dart';
 
 typedef Task<T> = Future<T> Function();
 
