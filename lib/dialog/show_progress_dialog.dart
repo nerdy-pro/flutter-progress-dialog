@@ -11,15 +11,15 @@ import 'package:flutter_future_progress_dialog/dialog/result.dart';
 typedef Task<T> = Future<T> Function();
 
 Future<void> _callback<T>(
-  w.BuildContext context,
+  w.NavigatorState navigator,
   Task<T> task,
   w.Route<ProgressDialogResult<T>> route,
 ) async {
   final result = await task.result();
-  if (!context.mounted) {
+  if (!route.isActive) {
     return;
   }
-  w.Navigator.of(context).removeRoute(route, result);
+  navigator.removeRoute(route, result);
 }
 
 /// Shows a progress dialog while executing a Future task.
@@ -74,9 +74,11 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
   bool fullscreenDialog = false,
   m.AnimationStyle? animationStyle,
 }) async {
+  final navigator = m.Navigator.of(context, rootNavigator: useRootNavigator);
+
   final themes = m.InheritedTheme.capture(
     from: context,
-    to: m.Navigator.of(context, rootNavigator: useRootNavigator).context,
+    to: navigator.context,
   );
 
   late final m.Route<ProgressDialogResult<T>> route;
@@ -84,7 +86,7 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
   route = m.DialogRoute<ProgressDialogResult<T>>(
     context: context,
     builder: (context) => ExactlyOnce(
-      callback: () => _callback(context, future, route),
+      callback: () => _callback(navigator, future, route),
       child: builder?.call(context) ?? const ProgressBarDialog(),
     ),
     barrierColor: barrierColor ??
@@ -103,8 +105,7 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
     fullscreenDialog: fullscreenDialog,
   );
 
-  final result = await m.Navigator.of(context, rootNavigator: useRootNavigator)
-      .push<ProgressDialogResult<T>>(route);
+  final result = await navigator.push<ProgressDialogResult<T>>(route);
 
   return result!;
 }
@@ -153,11 +154,13 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
   c.Color? barrierColor,
   bool? requestFocus,
 }) async {
+  final navigator = c.Navigator.of(context, rootNavigator: useRootNavigator);
+
   late final c.CupertinoDialogRoute<ProgressDialogResult<T>> route;
 
   route = c.CupertinoDialogRoute<ProgressDialogResult<T>>(
     builder: (context) => ExactlyOnce(
-      callback: () => _callback(context, future, route),
+      callback: () => _callback(navigator, future, route),
       child: builder?.call(context) ?? const CupertinoProgressBarDialog(),
     ),
     context: context,
@@ -167,8 +170,7 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
     anchorPoint: anchorPoint,
     requestFocus: requestFocus,
   );
-  final result = await c.Navigator.of(context, rootNavigator: useRootNavigator)
-      .push<ProgressDialogResult<T>>(route);
+  final result = await navigator.push<ProgressDialogResult<T>>(route);
   return result!;
 }
 
