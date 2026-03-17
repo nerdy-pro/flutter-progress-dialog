@@ -11,10 +11,6 @@ topics:
   - cupertino
   - loading
 
-screenshots:
-  - description: Progress dialog demo showing Material, Cupertino, custom, and failure variants.
-    path: img/flutter_progress_dialog.gif
-
 environment:
   sdk: ^3.0.0
 
