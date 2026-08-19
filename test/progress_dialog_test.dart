@@ -42,17 +42,22 @@ void main() {
     expect((result as Success<String>).value, 'ok');
   });
 
-  // Regression test: when the dialog is on a nested navigator and that
-  // navigator is removed from the tree while the task is in-flight,
-  // the dialog's context becomes unmounted. The original _callback would
-  // check context.mounted, return early, and never call removeRoute —
-  // causing push() to resolve with null and result! to throw.
+  // Regression test: when the dialog is on a nested navigator and that navigator
+  // is removed from the tree while the task is in-flight, the navigator force-
+  // disposes its routes without completing `Route.popped`. A result derived from
+  // `Navigator.push` alone would therefore never arrive and the caller would
+  // await forever. The dialog's own dispose signal settles it as Cancelled.
+  //
+  // Note this asserts on a captured value rather than awaiting the call: a
+  // regression here hangs rather than throws, so awaiting would stall the suite
+  // instead of failing it.
   testWidgets(
-    'showProgressDialog does not crash when context unmounts before task completes',
+    'showProgressDialog returns Cancelled when its navigator is disposed mid-task',
     (WidgetTester tester) async {
       final taskCompleter = Completer<void>();
       final showNestedNav = ValueNotifier(true);
       late BuildContext nestedContext;
+      ProgressDialogResult<String>? outcome;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -82,7 +87,7 @@ void main() {
           return 'ok';
         },
         useRootNavigator: false,
-      ).ignore();
+      ).then((result) => outcome = result);
 
       // Let the dialog build and ExactlyOnce fire _callback.
       // Can't use pumpAndSettle here — the pending task keeps the dialog
@@ -92,17 +97,71 @@ void main() {
       await tester.pump();
 
       // Remove the nested navigator from the tree — this disposes all its
-      // routes and unmounts the dialog's context while the task is running.
+      // routes and unmounts the dialog's subtree while the task is running.
       showNestedNav.value = false;
       await tester.pumpAndSettle();
 
-      // Complete the task after context has been unmounted.
+      expect(
+        outcome,
+        isA<Cancelled<String>>(),
+        reason: 'the caller must be released when the navigator goes away',
+      );
+
+      // The task is not interrupted; completing it later changes nothing.
       taskCompleter.complete();
       await tester.pumpAndSettle();
+      expect(outcome, isA<Cancelled<String>>());
+      expect(tester.takeException(), isNull);
+    },
+  );
 
-      // With the old code, _callback returns early (context.mounted == false),
-      // removeRoute is never called, and push() resolves with null causing
-      // result! to throw.
+  testWidgets(
+    'showCupertinoProgressDialog returns Cancelled when its navigator is disposed mid-task',
+    (WidgetTester tester) async {
+      final taskCompleter = Completer<void>();
+      final showNestedNav = ValueNotifier(true);
+      late BuildContext nestedContext;
+      ProgressDialogResult<String>? outcome;
+
+      await tester.pumpWidget(
+        CupertinoApp(
+          home: ValueListenableBuilder<bool>(
+            valueListenable: showNestedNav,
+            builder: (_, show, __) {
+              if (!show) return const SizedBox();
+              return Navigator(
+                onGenerateRoute: (_) => CupertinoPageRoute(
+                  builder: (ctx) {
+                    nestedContext = ctx;
+                    return const SizedBox();
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      showCupertinoProgressDialog<String>(
+        context: nestedContext,
+        future: () async {
+          await taskCompleter.future;
+          return 'ok';
+        },
+        useRootNavigator: false,
+      ).then((result) => outcome = result);
+
+      await tester.pump();
+      await tester.pump();
+
+      showNestedNav.value = false;
+      await tester.pumpAndSettle();
+
+      expect(outcome, isA<Cancelled<String>>());
+
+      taskCompleter.complete();
+      await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     },
   );
