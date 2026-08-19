@@ -387,4 +387,307 @@ void main() {
       expect(ProgressDialogResult.cancelled<String>(), isA<Cancelled<String>>());
     });
   });
+
+  // A task whose value is legitimately null must not be confused with the
+  // absence of a result. `push` resolves with the ProgressDialogResult wrapper,
+  // which is never null when the task delivers, so Success(null) survives the
+  // `result ?? Cancelled<T>()` fallback intact.
+  group('nullable task results', () {
+    testWidgets('showProgressDialog returns Success for a Future<Null> task', (WidgetTester tester) async {
+      final completer = Completer<ProgressDialogResult<Null>>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: Builder(
+              builder: (context) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  showProgressDialog<Null>(
+                    context: context,
+                    future: () async {
+                      await Future<void>.delayed(const Duration(milliseconds: 100));
+                      return null;
+                    },
+                  ).then(completer.complete);
+                });
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final result = await completer.future;
+      expect(result, isA<Success<Null>>());
+      expect((result as Success<Null>).value, isNull);
+      expect(result.isSuccess, isTrue);
+      expect(result.isCancelled, isFalse);
+      expect(result.unwrap(), isNull);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('showProgressDialog reports a null value as Success, not Cancelled', (WidgetTester tester) async {
+      final completer = Completer<ProgressDialogResult<String?>>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: Builder(
+              builder: (context) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  showProgressDialog<String?>(
+                    context: context,
+                    future: () async {
+                      await Future<void>.delayed(const Duration(milliseconds: 100));
+                      return null;
+                    },
+                  ).then(completer.complete);
+                });
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final result = await completer.future;
+      expect(result, const Success<String?>(null));
+      expect(result.isCancelled, isFalse);
+      expect(result.unwrap(), isNull);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('showCupertinoProgressDialog returns Success for a Future<Null> task', (WidgetTester tester) async {
+      final completer = Completer<ProgressDialogResult<Null>>();
+
+      await tester.pumpWidget(
+        CupertinoApp(
+          home: Builder(
+            builder: (context) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                showCupertinoProgressDialog<Null>(
+                  context: context,
+                  future: () async {
+                    await Future<void>.delayed(const Duration(milliseconds: 100));
+                    return null;
+                  },
+                ).then(completer.complete);
+              });
+              return Container();
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final result = await completer.future;
+      expect(result, isA<Success<Null>>());
+      expect((result as Success<Null>).value, isNull);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('showProgressDialog returns Cancelled when a nullable task is dismissed', (WidgetTester tester) async {
+      final taskCompleter = Completer<String?>();
+      final completer = Completer<ProgressDialogResult<String?>>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: Builder(
+              builder: (context) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  showProgressDialog<String?>(
+                    context: context,
+                    future: () => taskCompleter.future,
+                  ).then(completer.complete);
+                });
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      final result = await completer.future;
+      expect(result, isA<Cancelled<String?>>());
+      expect(result.isCancelled, isTrue);
+      expect(result.isSuccess, isFalse);
+      expect(tester.takeException(), isNull);
+
+      taskCompleter.complete(null);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('showProgressDialog surfaces errors from a Future<Null> task', (WidgetTester tester) async {
+      final completer = Completer<ProgressDialogResult<Null>>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: Builder(
+              builder: (context) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  showProgressDialog<Null>(
+                    context: context,
+                    future: () async {
+                      await Future<void>.delayed(const Duration(milliseconds: 100));
+                      throw 'boom';
+                    },
+                  ).then(completer.complete);
+                });
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final result = await completer.future;
+      expect(result, isA<Failure<Null>>());
+      expect((result as Failure<Null>).error, 'boom');
+      expect(tester.takeException(), isNull);
+    });
+
+    // Realistic usage: no explicit type argument, T comes from the task's own
+    // Future<String?> signature. runtimeType is checked exactly because
+    // Success<Null> would satisfy isA<Success<String?>>() by covariance.
+    testWidgets('showProgressDialog infers String? from the task signature', (WidgetTester tester) async {
+      final completer = Completer<ProgressDialogResult<String?>>();
+
+      Future<String?> nullableTask() async {
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        return null;
+      }
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: Builder(
+              builder: (context) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  showProgressDialog(
+                    context: context,
+                    future: nullableTask,
+                  ).then(completer.complete);
+                });
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final result = await completer.future;
+      expect(result.runtimeType, Success<String?>);
+      expect((result as Success<String?>).value, isNull);
+      expect(result.isSuccess, isTrue);
+      expect(result.isCancelled, isFalse);
+      expect(result.unwrap(), isNull);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('showProgressDialog carries a non-null value on a String? task', (WidgetTester tester) async {
+      final completer = Completer<ProgressDialogResult<String?>>();
+
+      Future<String?> nullableTask() async {
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        return 'ok';
+      }
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: Builder(
+              builder: (context) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  showProgressDialog(
+                    context: context,
+                    future: nullableTask,
+                  ).then(completer.complete);
+                });
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final result = await completer.future;
+      expect(result.runtimeType, Success<String?>);
+      expect(result, const Success<String?>('ok'));
+      expect(result.unwrap(), 'ok');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('showProgressDialog infers String? when a nullable task is dismissed', (WidgetTester tester) async {
+      final taskCompleter = Completer<String?>();
+      final completer = Completer<ProgressDialogResult<String?>>();
+
+      Future<String?> nullableTask() => taskCompleter.future;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: Builder(
+              builder: (context) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  showProgressDialog(
+                    context: context,
+                    future: nullableTask,
+                  ).then(completer.complete);
+                });
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      final result = await completer.future;
+      expect(result.runtimeType, Cancelled<String?>);
+      expect(result.isCancelled, isTrue);
+      expect(tester.takeException(), isNull);
+
+      taskCompleter.complete(null);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
+    test('a null Success is distinguishable from Cancelled', () {
+      const success = Success<String?>(null);
+      const cancelled = Cancelled<String?>();
+
+      expect(success, isNot(equals(cancelled)));
+      expect(success.isSuccess, isTrue);
+      expect(success.isCancelled, isFalse);
+      expect(cancelled.isSuccess, isFalse);
+      expect(cancelled.isCancelled, isTrue);
+    });
+
+    test('map and flatMap carry a null value through', () {
+      const success = Success<String?>(null);
+
+      expect(success.map((v) => v?.length), const Success<int?>(null));
+      expect(
+        success.flatMap((v) => Success<int?>(v?.length)),
+        const Success<int?>(null),
+      );
+    });
+  });
 }
