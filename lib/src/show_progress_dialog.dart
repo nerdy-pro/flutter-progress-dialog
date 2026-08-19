@@ -53,7 +53,10 @@ class _Outcome<T> {
     w.NavigatorState navigator,
     w.Route<ProgressDialogResult<T>> route,
   ) {
-    navigator.push<ProgressDialogResult<T>>(route).then((result) => settle(result ?? Cancelled<T>())).ignore();
+    navigator
+        .push<ProgressDialogResult<T>>(route)
+        .then((result) => settle(result ?? Cancelled<T>()))
+        .ignore();
 
     // If the navigator is disposed before the route ever builds, the dialog's
     // onDispose never fires because its state was never created.

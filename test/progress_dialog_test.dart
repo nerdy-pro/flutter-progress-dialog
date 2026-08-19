@@ -7,7 +7,8 @@ import 'package:flutter_future_progress_dialog/flutter_future_progress_dialog.da
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('showProgressDialog completes with some value', (WidgetTester tester) async {
+  testWidgets('showProgressDialog completes with some value',
+      (WidgetTester tester) async {
     final completer = Completer<ProgressDialogResult<String>?>();
     dialogTest(BuildContext context) async {
       final result = await showProgressDialog(
@@ -166,7 +167,8 @@ void main() {
     },
   );
 
-  testWidgets('showProgressDialog completes with some error', (WidgetTester tester) async {
+  testWidgets('showProgressDialog completes with some error',
+      (WidgetTester tester) async {
     final completer = Completer<ProgressDialogResult<String>?>();
     dialogTest(BuildContext context) async {
       final result = await showProgressDialog(
@@ -443,7 +445,8 @@ void main() {
     });
 
     test('ProgressDialogResult.cancelled builds a Cancelled', () {
-      expect(ProgressDialogResult.cancelled<String>(), isA<Cancelled<String>>());
+      expect(
+          ProgressDialogResult.cancelled<String>(), isA<Cancelled<String>>());
     });
   });
 
@@ -452,7 +455,8 @@ void main() {
   // which is never null when the task delivers, so Success(null) survives the
   // `result ?? Cancelled<T>()` fallback intact.
   group('nullable task results', () {
-    testWidgets('showProgressDialog returns Success for a Future<Null> task', (WidgetTester tester) async {
+    testWidgets('showProgressDialog returns Success for a Future<Null> task',
+        (WidgetTester tester) async {
       final completer = Completer<ProgressDialogResult<Null>>();
 
       await tester.pumpWidget(
@@ -464,7 +468,8 @@ void main() {
                   showProgressDialog<Null>(
                     context: context,
                     future: () async {
-                      await Future<void>.delayed(const Duration(milliseconds: 100));
+                      await Future<void>.delayed(
+                          const Duration(milliseconds: 100));
                       return null;
                     },
                   ).then(completer.complete);
@@ -486,7 +491,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('showProgressDialog reports a null value as Success, not Cancelled', (WidgetTester tester) async {
+    testWidgets(
+        'showProgressDialog reports a null value as Success, not Cancelled',
+        (WidgetTester tester) async {
       final completer = Completer<ProgressDialogResult<String?>>();
 
       await tester.pumpWidget(
@@ -498,7 +505,8 @@ void main() {
                   showProgressDialog<String?>(
                     context: context,
                     future: () async {
-                      await Future<void>.delayed(const Duration(milliseconds: 100));
+                      await Future<void>.delayed(
+                          const Duration(milliseconds: 100));
                       return null;
                     },
                   ).then(completer.complete);
@@ -518,7 +526,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('showCupertinoProgressDialog returns Success for a Future<Null> task', (WidgetTester tester) async {
+    testWidgets(
+        'showCupertinoProgressDialog returns Success for a Future<Null> task',
+        (WidgetTester tester) async {
       final completer = Completer<ProgressDialogResult<Null>>();
 
       await tester.pumpWidget(
@@ -529,7 +539,8 @@ void main() {
                 showCupertinoProgressDialog<Null>(
                   context: context,
                   future: () async {
-                    await Future<void>.delayed(const Duration(milliseconds: 100));
+                    await Future<void>.delayed(
+                        const Duration(milliseconds: 100));
                     return null;
                   },
                 ).then(completer.complete);
@@ -547,7 +558,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('showProgressDialog returns Cancelled when a nullable task is dismissed', (WidgetTester tester) async {
+    testWidgets(
+        'showProgressDialog returns Cancelled when a nullable task is dismissed',
+        (WidgetTester tester) async {
       final taskCompleter = Completer<String?>();
       final completer = Completer<ProgressDialogResult<String?>>();
 
@@ -585,7 +598,8 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('showProgressDialog surfaces errors from a Future<Null> task', (WidgetTester tester) async {
+    testWidgets('showProgressDialog surfaces errors from a Future<Null> task',
+        (WidgetTester tester) async {
       final completer = Completer<ProgressDialogResult<Null>>();
 
       await tester.pumpWidget(
@@ -597,7 +611,8 @@ void main() {
                   showProgressDialog<Null>(
                     context: context,
                     future: () async {
-                      await Future<void>.delayed(const Duration(milliseconds: 100));
+                      await Future<void>.delayed(
+                          const Duration(milliseconds: 100));
                       throw 'boom';
                     },
                   ).then(completer.complete);
@@ -619,7 +634,8 @@ void main() {
     // Realistic usage: no explicit type argument, T comes from the task's own
     // Future<String?> signature. runtimeType is checked exactly because
     // Success<Null> would satisfy isA<Success<String?>>() by covariance.
-    testWidgets('showProgressDialog infers String? from the task signature', (WidgetTester tester) async {
+    testWidgets('showProgressDialog infers String? from the task signature',
+        (WidgetTester tester) async {
       final completer = Completer<ProgressDialogResult<String?>>();
 
       Future<String?> nullableTask() async {
@@ -655,7 +671,8 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('showProgressDialog carries a non-null value on a String? task', (WidgetTester tester) async {
+    testWidgets('showProgressDialog carries a non-null value on a String? task',
+        (WidgetTester tester) async {
       final completer = Completer<ProgressDialogResult<String?>>();
 
       Future<String?> nullableTask() async {
@@ -689,7 +706,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('showProgressDialog infers String? when a nullable task is dismissed', (WidgetTester tester) async {
+    testWidgets(
+        'showProgressDialog infers String? when a nullable task is dismissed',
+        (WidgetTester tester) async {
       final taskCompleter = Completer<String?>();
       final completer = Completer<ProgressDialogResult<String?>>();
 
@@ -754,7 +773,8 @@ void main() {
   // theme, the way Flutter's own showAdaptiveDialog does — not the host OS the
   // process happens to be running on.
   group('adaptive platform selection', () {
-    Future<Completer<void>> pumpAdaptive(WidgetTester tester, TargetPlatform platform) async {
+    Future<Completer<void>> pumpAdaptive(
+        WidgetTester tester, TargetPlatform platform) async {
       final task = Completer<void>();
 
       await tester.pumpWidget(
@@ -783,7 +803,8 @@ void main() {
     }
 
     for (final platform in [TargetPlatform.iOS, TargetPlatform.macOS]) {
-      testWidgets('uses a Cupertino dialog on $platform', (WidgetTester tester) async {
+      testWidgets('uses a Cupertino dialog on $platform',
+          (WidgetTester tester) async {
         final task = await pumpAdaptive(tester, platform);
 
         expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
@@ -801,7 +822,8 @@ void main() {
       TargetPlatform.linux,
       TargetPlatform.windows,
     ]) {
-      testWidgets('uses a Material dialog on $platform', (WidgetTester tester) async {
+      testWidgets('uses a Material dialog on $platform',
+          (WidgetTester tester) async {
         final task = await pumpAdaptive(tester, platform);
 
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -813,7 +835,8 @@ void main() {
       });
     }
 
-    testWidgets('returns a result like the non-adaptive variants', (WidgetTester tester) async {
+    testWidgets('returns a result like the non-adaptive variants',
+        (WidgetTester tester) async {
       final completer = Completer<ProgressDialogResult<String>>();
 
       await tester.pumpWidget(
@@ -826,7 +849,8 @@ void main() {
                   showAdaptiveProgressDialog<String>(
                     context: context,
                     future: () async {
-                      await Future<void>.delayed(const Duration(milliseconds: 100));
+                      await Future<void>.delayed(
+                          const Duration(milliseconds: 100));
                       return 'ok';
                     },
                   ).then(completer.complete);
