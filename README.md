@@ -322,7 +322,6 @@ Yes, if you use the `BuildContext` afterwards. `showProgressDialog` closes its o
 
 - **The task cannot be aborted.** Cancellation dismisses the dialog, not the work. See [Can the user cancel the progress dialog?](#can-the-user-cancel-the-progress-dialog)
 - **No determinate progress.** The dialog shows an indeterminate spinner; there is no percentage or step reporting.
-- **If the hosting `Navigator` is disposed while the task is in flight** — for example a nested navigator removed from the widget tree — the dialog is torn down without error, but the returned future never completes, so the `await` waits forever.
 
 ## Contributing
 

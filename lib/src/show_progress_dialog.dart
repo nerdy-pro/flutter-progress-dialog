@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart' as c;
 import 'package:flutter/material.dart' as m;
 import 'package:flutter/widgets.dart' as w;
@@ -12,12 +14,57 @@ Future<void> _callback<T>(
   w.NavigatorState navigator,
   Task<T> task,
   w.Route<ProgressDialogResult<T>> route,
+  _Settle<T> settle,
 ) async {
   final result = await task.result();
+  // Settle before removing the route: tearing the route down fires the dialog's
+  // onDispose, and the real result must win that race.
+  settle(result);
   if (!route.isActive) {
     return;
   }
   navigator.removeRoute(route, result);
+}
+
+typedef _Settle<T> = void Function(ProgressDialogResult<T> result);
+
+/// Drives the returned future from whichever of three things happens first: the
+/// task delivering a result, the route being popped, or the route's subtree
+/// being torn down.
+///
+/// The last case is why this exists. When a [w.Navigator] is disposed it force-
+/// disposes its routes without completing `Route.popped`, so a future derived
+/// from `Navigator.push` alone would never complete and the caller would await
+/// forever.
+class _Outcome<T> {
+  final _completer = Completer<ProgressDialogResult<T>>();
+
+  Future<ProgressDialogResult<T>> get future => _completer.future;
+
+  void settle(ProgressDialogResult<T> result) {
+    if (!_completer.isCompleted) {
+      _completer.complete(result);
+    }
+  }
+
+  /// Wires up the route-popped and never-installed paths, and returns the
+  /// future the caller should await.
+  Future<ProgressDialogResult<T>> track(
+    w.NavigatorState navigator,
+    w.Route<ProgressDialogResult<T>> route,
+  ) {
+    navigator.push<ProgressDialogResult<T>>(route).then((result) => settle(result ?? Cancelled<T>())).ignore();
+
+    // If the navigator is disposed before the route ever builds, the dialog's
+    // onDispose never fires because its state was never created.
+    w.WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (route.navigator == null) {
+        settle(Cancelled<T>());
+      }
+    });
+
+    return future;
+  }
 }
 
 /// Shows a progress dialog while executing an asynchronous task.
@@ -86,11 +133,13 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
   );
 
   late final m.Route<ProgressDialogResult<T>> route;
+  final outcome = _Outcome<T>();
 
   route = m.DialogRoute<ProgressDialogResult<T>>(
     context: context,
     builder: (context) => ExactlyOnce(
-      callback: () => _callback(navigator, future, route),
+      callback: () => _callback(navigator, future, route, outcome.settle),
+      onDispose: () => outcome.settle(Cancelled<T>()),
       child: builder?.call(context) ?? const ProgressBarDialog(),
     ),
     barrierColor: barrierColor ??
@@ -109,9 +158,7 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
     fullscreenDialog: fullscreenDialog,
   );
 
-  final result = await navigator.push<ProgressDialogResult<T>>(route);
-
-  return result ?? Cancelled<T>();
+  return outcome.track(navigator, route);
 }
 
 /// Shows a Cupertino-styled progress dialog while executing an asynchronous task.
@@ -167,10 +214,12 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
   final navigator = c.Navigator.of(context, rootNavigator: useRootNavigator);
 
   late final c.CupertinoDialogRoute<ProgressDialogResult<T>> route;
+  final outcome = _Outcome<T>();
 
   route = c.CupertinoDialogRoute<ProgressDialogResult<T>>(
     builder: (context) => ExactlyOnce(
-      callback: () => _callback(navigator, future, route),
+      callback: () => _callback(navigator, future, route, outcome.settle),
+      onDispose: () => outcome.settle(Cancelled<T>()),
       child: builder?.call(context) ?? const CupertinoProgressBarDialog(),
     ),
     context: context,
@@ -180,8 +229,7 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
     anchorPoint: anchorPoint,
     requestFocus: requestFocus,
   );
-  final result = await navigator.push<ProgressDialogResult<T>>(route);
-  return result ?? Cancelled<T>();
+  return outcome.track(navigator, route);
 }
 
 /// Shows a platform-adaptive progress dialog while executing an asynchronous task.

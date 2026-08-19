@@ -12,6 +12,10 @@ exhaustive `switch` statements over it need a `Cancelled` case added.
   `map()` and `flatMap()` pass cancellation through
 * Note: the task is not interrupted on cancellation — Dart futures cannot be
   cancelled, so it runs to completion and its result is discarded
+* Fixed the returned future never completing when the hosting `Navigator` is
+  disposed while the task is in flight — for example a nested navigator removed
+  from the widget tree. The call now settles with `Cancelled` instead of leaving
+  the caller awaiting forever
 * Added Flutter Web support — `flutter_future_progress_dialog` no longer imports
   `dart:io`, so pub.dev now reports all six platforms
 * **Behaviour change:** `showAdaptiveProgressDialog` now selects its style from
