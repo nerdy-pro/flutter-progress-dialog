@@ -27,6 +27,11 @@ Future<String> _successTask() async {
   return 'Task completed';
 }
 
+Future<String> _slowTask() async {
+  await Future.delayed(const Duration(seconds: 10));
+  return 'Task completed';
+}
+
 Future<String> _failingTask() async {
   await Future.delayed(const Duration(seconds: 2));
   throw Exception('Something went wrong');
@@ -39,6 +44,7 @@ class ExamplePage extends StatelessWidget {
     final message = switch (result) {
       Success(:final value) => value,
       Failure(:final error) => 'Error: $error',
+      Cancelled() => 'Cancelled',
     };
 
     ScaffoldMessenger.of(context)
@@ -86,6 +92,34 @@ class ExamplePage extends StatelessWidget {
     _showResult(context, result);
   }
 
+  // A custom dialog that offers its own cancel button. Popping the route
+  // resolves the call with Cancelled; the task keeps running in the background.
+  Future<void> _onCancellable(BuildContext context) async {
+    final result = await showProgressDialog(
+      context: context,
+      future: () => _slowTask(),
+      builder: (dialogContext) => Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 16,
+            children: [
+              const CircularProgressIndicator(),
+              const Text('This takes a while...'),
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('Cancel'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (!context.mounted) return;
+    _showResult(context, result);
+  }
+
   Future<void> _onFailure(BuildContext context) async {
     final result = await showProgressDialog(
       context: context,
@@ -118,6 +152,10 @@ class ExamplePage extends StatelessWidget {
             FilledButton(
               onPressed: () => _onCustom(context),
               child: const Text('Custom dialog'),
+            ),
+            FilledButton(
+              onPressed: () => _onCancellable(context),
+              child: const Text('Cancellable'),
             ),
             FilledButton.tonal(
               onPressed: () => _onFailure(context),
