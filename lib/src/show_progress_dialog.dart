@@ -41,8 +41,11 @@ Future<void> _callback<T>(
 /// * [fullscreenDialog] - Whether this dialog is a fullscreen dialog
 /// * [animationStyle] - Style of the dialog animation
 ///
-/// Returns a [ProgressDialogResult] containing either the successful result value
-/// or error details if the future fails.
+/// Returns a [ProgressDialogResult]: [Success] with the value, [Failure] with the
+/// error details if the future fails, or [Cancelled] if the dialog is dismissed
+/// before the task delivers a result — for example by the Android back button, or
+/// by a custom [builder] that calls `Navigator.pop`. The task itself is not
+/// interrupted in that case; it runs to completion and its result is discarded.
 ///
 /// Example:
 /// ```dart
@@ -57,6 +60,9 @@ Future<void> _callback<T>(
 ///     break;
 ///   case Failure(error: final error):
 ///     print('Task failed: $error');
+///     break;
+///   case Cancelled():
+///     print('Dialog dismissed before the task finished');
 ///     break;
 /// }
 /// ```
@@ -107,7 +113,7 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
 
   final result = await navigator.push<ProgressDialogResult<T>>(route);
 
-  return result!;
+  return result ?? Cancelled<T>();
 }
 
 /// Shows a Cupertino-styled progress dialog while executing an asynchronous task.
@@ -125,8 +131,11 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
 /// * [barrierColor] - Color of the modal barrier behind the dialog
 /// * [requestFocus] - Whether the dialog should request focus when opened
 ///
-/// Returns a [ProgressDialogResult] containing either the successful result value
-/// or error details if the future fails.
+/// Returns a [ProgressDialogResult]: [Success] with the value, [Failure] with the
+/// error details if the future fails, or [Cancelled] if the dialog is dismissed
+/// before the task delivers a result — for example by the Android back button, or
+/// by a custom [builder] that calls `Navigator.pop`. The task itself is not
+/// interrupted in that case; it runs to completion and its result is discarded.
 ///
 /// Example:
 /// ```dart
@@ -141,6 +150,9 @@ Future<ProgressDialogResult<T>> showProgressDialog<T>({
 ///     break;
 ///   case Failure(error: final error):
 ///     print('Task failed: $error');
+///     break;
+///   case Cancelled():
+///     print('Dialog dismissed before the task finished');
 ///     break;
 /// }
 /// ```
@@ -171,7 +183,7 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
     requestFocus: requestFocus,
   );
   final result = await navigator.push<ProgressDialogResult<T>>(route);
-  return result!;
+  return result ?? Cancelled<T>();
 }
 
 /// Shows a platform-adaptive progress dialog while executing an asynchronous task.
@@ -191,8 +203,11 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
 /// * [useSafeArea] - Whether to respect system UI safe areas, defaults to true
 /// * [requestFocus] - Whether the dialog should request focus when opened
 ///
-/// Returns a [ProgressDialogResult] containing either the successful result value
-/// or error details if the future fails.
+/// Returns a [ProgressDialogResult]: [Success] with the value, [Failure] with the
+/// error details if the future fails, or [Cancelled] if the dialog is dismissed
+/// before the task delivers a result — for example by the Android back button, or
+/// by a custom [builder] that calls `Navigator.pop`. The task itself is not
+/// interrupted in that case; it runs to completion and its result is discarded.
 ///
 /// Example:
 /// ```dart
@@ -207,6 +222,9 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
 ///     break;
 ///   case Failure(error: final error):
 ///     print('Task failed: $error');
+///     break;
+///   case Cancelled():
+///     print('Dialog dismissed before the task finished');
 ///     break;
 /// }
 /// ```

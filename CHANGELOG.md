@@ -1,3 +1,18 @@
+## Unreleased
+
+**Breaking:** `ProgressDialogResult` is sealed and now has a third variant, so
+exhaustive `switch` statements over it need a `Cancelled` case added.
+
+* Fixed "Null check operator used on a null value" crash when the dialog was
+  dismissed before the task completed — by the Android back button, or by a
+  custom `builder` calling `Navigator.pop`
+* Added `Cancelled<T>` result variant, `isCancelled`, and
+  `ProgressDialogResult.cancelled()`
+* `unwrap()` throws `ProgressDialogCancelledException` for a cancelled result;
+  `map()` and `flatMap()` pass cancellation through
+* Note: the task is not interrupted on cancellation — Dart futures cannot be
+  cancelled, so it runs to completion and its result is discarded
+
 ## 1.5.0
 
 * Fixed crash when dialog context unmounts before task completes

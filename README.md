@@ -11,12 +11,13 @@ Developed and maintained by [Nerdy Pro](https://nerdy.pro).
 
 ## Features
 
-- Show a non-dismissible progress dialog while a Future is running
+- Show a modal progress dialog while a Future is running
 - Material and Cupertino dialog styles
 - Adaptive dialog that automatically matches the host platform
 - Custom dialog UI via a builder parameter
-- Type-safe `ProgressDialogResult<T>` with `Success` and `Failure` variants
+- Type-safe `ProgressDialogResult<T>` with `Success`, `Failure`, and `Cancelled` variants
 - Error handling with stack traces
+- Dismissal (back button, custom cancel button) reported as `Cancelled` rather than crashing
 
 ## Installation
 
@@ -51,6 +52,8 @@ Future<void> onButtonPressed(BuildContext context) async {
       print('Got: $value');
     case Failure(:final error):
       print('Error: $error');
+    case Cancelled():
+      print('Dismissed before the task finished');
   }
 }
 ```
@@ -89,10 +92,11 @@ final result = await showProgressDialog(
 
 ### Handling results
 
-`ProgressDialogResult<T>` is a sealed class with two variants:
+`ProgressDialogResult<T>` is a sealed class with three variants:
 
 - `Success<T>` — contains the `value` returned by the task
 - `Failure<T>` — contains the `error` and optional `stackTrace`
+- `Cancelled<T>` — the dialog was dismissed before the task delivered a result
 
 ```dart
 switch (result) {
@@ -102,16 +106,31 @@ switch (result) {
   case Failure(:final error, :final stackTrace):
     // Handle the error
     break;
+  case Cancelled():
+    // The user dismissed the dialog
+    break;
 }
 ```
+
+### Cancellation
+
+The dialog is modal and ignores taps on the barrier, but it is still a route: the
+Android back button pops it, and a custom `builder` may render its own cancel
+button that calls `Navigator.pop`. Either way the call returns `Cancelled<T>`.
+
+The task itself is **not** interrupted — Dart futures cannot be cancelled. It runs
+to completion in the background and its result, value or error, is discarded. If
+the task needs to stop doing work, give it its own cancellation mechanism.
 
 You can also use convenience methods:
 
 ```dart
-result.isSuccess; // true if Success
-result.isError;   // true if Failure
-result.unwrap();  // returns value or throws error
-result.map((v) => v.toString()); // transforms Success value
+result.isSuccess;   // true if Success
+result.isError;     // true if Failure
+result.isCancelled; // true if Cancelled
+result.unwrap();    // returns value, throws the error, or throws
+                    // ProgressDialogCancelledException if cancelled
+result.map((v) => v.toString()); // transforms Success value, passes the rest through
 ```
 
 ## API reference
