@@ -690,4 +690,98 @@ void main() {
       );
     });
   });
+
+  // showAdaptiveProgressDialog must follow the target platform reported by the
+  // theme, the way Flutter's own showAdaptiveDialog does — not the host OS the
+  // process happens to be running on.
+  group('adaptive platform selection', () {
+    Future<Completer<void>> pumpAdaptive(WidgetTester tester, TargetPlatform platform) async {
+      final task = Completer<void>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(platform: platform),
+          home: Material(
+            child: Builder(
+              builder: (context) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  showAdaptiveProgressDialog<void>(
+                    context: context,
+                    future: () => task.future,
+                  ).ignore();
+                });
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      return task;
+    }
+
+    for (final platform in [TargetPlatform.iOS, TargetPlatform.macOS]) {
+      testWidgets('uses a Cupertino dialog on $platform', (WidgetTester tester) async {
+        final task = await pumpAdaptive(tester, platform);
+
+        expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+
+        task.complete();
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    for (final platform in [
+      TargetPlatform.android,
+      TargetPlatform.fuchsia,
+      TargetPlatform.linux,
+      TargetPlatform.windows,
+    ]) {
+      testWidgets('uses a Material dialog on $platform', (WidgetTester tester) async {
+        final task = await pumpAdaptive(tester, platform);
+
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(find.byType(CupertinoActivityIndicator), findsNothing);
+
+        task.complete();
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    testWidgets('returns a result like the non-adaptive variants', (WidgetTester tester) async {
+      final completer = Completer<ProgressDialogResult<String>>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(platform: TargetPlatform.android),
+          home: Material(
+            child: Builder(
+              builder: (context) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  showAdaptiveProgressDialog<String>(
+                    context: context,
+                    future: () async {
+                      await Future<void>.delayed(const Duration(milliseconds: 100));
+                      return 'ok';
+                    },
+                  ).then(completer.complete);
+                });
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(await completer.future, const Success<String>('ok'));
+      expect(tester.takeException(), isNull);
+    });
+  });
 }

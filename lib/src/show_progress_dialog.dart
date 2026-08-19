@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart' as c;
 import 'package:flutter/material.dart' as m;
 import 'package:flutter/widgets.dart' as w;
@@ -191,6 +189,10 @@ Future<ProgressDialogResult<T>> showCupertinoProgressDialog<T>({
 /// Displays a Cupertino-styled dialog on iOS and macOS, and a Material-styled
 /// dialog on all other platforms.
 ///
+/// The style is chosen from `Theme.of(context).platform`, matching Flutter's own
+/// `showAdaptiveDialog`. An app that overrides `ThemeData.platform` therefore
+/// gets the dialog style it asked for, and the choice works on Flutter Web.
+///
 /// Parameters:
 /// * [context] - The build context used to show the dialog
 /// * [future] - The async task to execute while showing the progress dialog
@@ -240,7 +242,8 @@ Future<ProgressDialogResult<T>> showAdaptiveProgressDialog<T>({
   bool useSafeArea = true,
   bool? requestFocus,
 }) async {
-  if (Platform.isMacOS || Platform.isIOS) {
+  final platform = m.Theme.of(context).platform;
+  if (platform == m.TargetPlatform.iOS || platform == m.TargetPlatform.macOS) {
     return await showCupertinoProgressDialog(
       context: context,
       future: future,

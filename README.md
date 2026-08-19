@@ -120,7 +120,7 @@ Supported platforms, as reported on [pub.dev](https://pub.dev/packages/flutter_f
 | macOS | Yes |
 | Windows | Yes |
 | Linux | Yes |
-| Web | No — `flutter_future_progress_dialog` imports `dart:io` for the platform check in `showAdaptiveProgressDialog` |
+| Web | Yes |
 
 ## Installation
 
@@ -159,6 +159,8 @@ Note that `future` takes a *callback* returning a `Future`, not a `Future` itsel
 ### How do I show an iOS-style progress dialog?
 
 Call `showCupertinoProgressDialog` for an iOS-styled dialog built around `CupertinoActivityIndicator`, or `showAdaptiveProgressDialog` to select the style automatically — Cupertino on iOS and macOS, Material everywhere else.
+
+`showAdaptiveProgressDialog` reads `Theme.of(context).platform`, the same signal Flutter's own `showAdaptiveDialog` uses. An app that overrides `ThemeData.platform` gets the style it asked for, and the selection works on Flutter Web.
 
 ```dart
 // Always iOS style
@@ -257,7 +259,7 @@ final result = await showProgressDialog(
 |---|---|---|
 | `showProgressDialog<T>` | Material — `Dialog` with a `CircularProgressIndicator` | `Future<ProgressDialogResult<T>>` |
 | `showCupertinoProgressDialog<T>` | Cupertino — `CupertinoPopupSurface` with a `CupertinoActivityIndicator` | `Future<ProgressDialogResult<T>>` |
-| `showAdaptiveProgressDialog<T>` | Cupertino on iOS and macOS, Material elsewhere | `Future<ProgressDialogResult<T>>` |
+| `showAdaptiveProgressDialog<T>` | Cupertino on iOS and macOS, Material elsewhere, per `Theme.of(context).platform` | `Future<ProgressDialogResult<T>>` |
 
 ### Parameters
 
@@ -306,11 +308,11 @@ Yes. A `Future<void>` task yields `Success<void>`, and a task returning `null` y
 
 ### Does flutter_future_progress_dialog support Flutter Web?
 
-No. `flutter_future_progress_dialog` imports `dart:io` to detect the platform in `showAdaptiveProgressDialog`, so pub.dev lists Android, iOS, macOS, Windows, and Linux, but not Web.
+Yes. `flutter_future_progress_dialog` supports all six Flutter platforms — Android, iOS, macOS, Windows, Linux, and Web. Platform detection in `showAdaptiveProgressDialog` goes through `Theme.of(context).platform` rather than `dart:io`, so nothing is host-specific.
 
 ### What is the difference between the three functions?
 
-`showProgressDialog` always renders a Material dialog, `showCupertinoProgressDialog` always renders an iOS-style dialog, and `showAdaptiveProgressDialog` picks between them based on the host platform. All three take the same task callback and return the same `ProgressDialogResult<T>`.
+`showProgressDialog` always renders a Material dialog, `showCupertinoProgressDialog` always renders an iOS-style dialog, and `showAdaptiveProgressDialog` picks between them based on `Theme.of(context).platform`. All three take the same task callback and return the same `ProgressDialogResult<T>`.
 
 ### Do I need to check `context.mounted` after awaiting?
 
@@ -319,7 +321,6 @@ Yes, if you use the `BuildContext` afterwards. `showProgressDialog` closes its o
 ## Known limitations
 
 - **The task cannot be aborted.** Cancellation dismisses the dialog, not the work. See [Can the user cancel the progress dialog?](#can-the-user-cancel-the-progress-dialog)
-- **No Flutter Web support**, because of the `dart:io` import used for platform detection.
 - **No determinate progress.** The dialog shows an indeterminate spinner; there is no percentage or step reporting.
 - **If the hosting `Navigator` is disposed while the task is in flight** — for example a nested navigator removed from the widget tree — the dialog is torn down without error, but the returned future never completes, so the `await` waits forever.
 
