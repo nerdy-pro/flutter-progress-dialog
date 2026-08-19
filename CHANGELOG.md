@@ -12,6 +12,12 @@ exhaustive `switch` statements over it need a `Cancelled` case added.
   `map()` and `flatMap()` pass cancellation through
 * Note: the task is not interrupted on cancellation — Dart futures cannot be
   cancelled, so it runs to completion and its result is discarded
+* Added Flutter Web support — `flutter_future_progress_dialog` no longer imports
+  `dart:io`, so pub.dev now reports all six platforms
+* **Behaviour change:** `showAdaptiveProgressDialog` now selects its style from
+  `Theme.of(context).platform` instead of the host operating system, matching
+  Flutter's own `showAdaptiveDialog`. An app that sets `ThemeData(platform: ...)`
+  now gets the style it asked for rather than the style of the machine it runs on
 
 ## 1.5.0
 
