@@ -5,9 +5,10 @@ on:
 
 jobs:
 
-  test:
-    name: Run tests
+  verify:
+    name: Analyze and test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
 
@@ -19,12 +20,19 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Analyze project source
+        run: dart analyze --fatal-infos
+
       - name: Run tests
         run: flutter test
 
+      # Guards web support: a `dart:io` import in lib/ fails to compile here.
+      - name: Run tests on web
+        run: flutter test --platform chrome
+
   publish:
     name: Publish to pub.dev
-    needs: [ test ]
+    needs: [ verify ]
     permissions:
       id-token: write # Required for authentication using OIDC
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1

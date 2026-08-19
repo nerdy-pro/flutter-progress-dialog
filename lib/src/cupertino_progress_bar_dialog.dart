@@ -49,7 +49,8 @@ class _CupertinoProgressBarDialog extends State<CupertinoProgressBarDialog> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return AnimatedPadding(
-              padding: MediaQuery.viewInsetsOf(context) + const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+              padding: MediaQuery.viewInsetsOf(context) +
+                  const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
               duration: widget.insetAnimationDuration,
               curve: widget.insetAnimationCurve,
               child: MediaQuery.removeViewInsets(
@@ -60,7 +61,8 @@ class _CupertinoProgressBarDialog extends State<CupertinoProgressBarDialog> {
                 context: context,
                 child: Center(
                   child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: _kDialogEdgePadding),
+                    margin: const EdgeInsets.symmetric(
+                        vertical: _kDialogEdgePadding),
                     width: _kCupertinoProgressSize,
                     height: _kCupertinoProgressSize,
                     child: const CupertinoPopupSurface(

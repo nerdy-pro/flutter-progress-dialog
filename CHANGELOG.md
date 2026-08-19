@@ -1,27 +1,39 @@
-## Unreleased
+## 2.0.0
 
-**Breaking:** `ProgressDialogResult` is sealed and now has a third variant, so
-exhaustive `switch` statements over it need a `Cancelled` case added.
+### Breaking changes
 
-* Fixed "Null check operator used on a null value" crash when the dialog was
-  dismissed before the task completed — by the Android back button, or by a
-  custom `builder` calling `Navigator.pop`
-* Added `Cancelled<T>` result variant, `isCancelled`, and
-  `ProgressDialogResult.cancelled()`
-* `unwrap()` throws `ProgressDialogCancelledException` for a cancelled result;
-  `map()` and `flatMap()` pass cancellation through
-* Note: the task is not interrupted on cancellation — Dart futures cannot be
-  cancelled, so it runs to completion and its result is discarded
-* Fixed the returned future never completing when the hosting `Navigator` is
-  disposed while the task is in flight — for example a nested navigator removed
-  from the widget tree. The call now settles with `Cancelled` instead of leaving
-  the caller awaiting forever
-* Added Flutter Web support — `flutter_future_progress_dialog` no longer imports
-  `dart:io`, so pub.dev now reports all six platforms
-* **Behaviour change:** `showAdaptiveProgressDialog` now selects its style from
+* `ProgressDialogResult` gained a third variant, `Cancelled<T>`. The type is
+  sealed, so exhaustive `switch` statements over a result need a `Cancelled`
+  case added. See "Migrating from 1.x" in the README
+* `showAdaptiveProgressDialog` now selects its style from
   `Theme.of(context).platform` instead of the host operating system, matching
   Flutter's own `showAdaptiveDialog`. An app that sets `ThemeData(platform: ...)`
   now gets the style it asked for rather than the style of the machine it runs on
+
+### Added
+
+* Flutter Web support — `flutter_future_progress_dialog` no longer imports
+  `dart:io`, so pub.dev now reports all six platforms
+* `Cancelled<T>` result variant, the `isCancelled` getter, and
+  `ProgressDialogResult.cancelled()`
+* `ProgressDialogCancelledException`, thrown by `unwrap()` on a cancelled result
+
+### Fixed
+
+* "Null check operator used on a null value" crash when the dialog was dismissed
+  before the task completed — by the Android back button, or by a custom
+  `builder` calling `Navigator.pop`
+* The returned future never completing when the hosting `Navigator` was disposed
+  while the task was in flight, which left the caller awaiting forever. The call
+  now settles with `Cancelled`
+* `map()` and `flatMap()` now pass cancellation through instead of failing to
+  compile against the widened result type
+
+### Notes
+
+* Cancellation dismisses the dialog, not the task. Dart futures cannot be
+  cancelled, so the work runs to completion in the background and its result is
+  discarded
 
 ## 1.5.0
 

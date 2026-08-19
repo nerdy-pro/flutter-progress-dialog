@@ -22,6 +22,7 @@ Developed and maintained by [Nerdy Pro](https://nerdy.pro).
 - [Usage](#usage)
 - [API reference](#api-reference)
 - [FAQ](#faq)
+- [Migrating from 1.x](#migrating-from-1x)
 - [Known limitations](#known-limitations)
 - [License](#license)
 
@@ -132,7 +133,7 @@ Or add it to `pubspec.yaml` manually:
 
 ```yaml
 dependencies:
-  flutter_future_progress_dialog: ^1.5.0
+  flutter_future_progress_dialog: ^2.0.0
 ```
 
 Then import it:
@@ -317,6 +318,56 @@ Yes. `flutter_future_progress_dialog` supports all six Flutter platforms — And
 ### Do I need to check `context.mounted` after awaiting?
 
 Yes, if you use the `BuildContext` afterwards. `showProgressDialog` closes its own dialog, but your `context` may still have been unmounted while the task was running, so guard any subsequent use of it as you would after any `await`.
+
+## Migrating from 1.x
+
+Version 2.0.0 has two breaking changes.
+
+### `ProgressDialogResult` has a third variant
+
+`Cancelled<T>` was added so that dismissing the dialog reports an outcome instead
+of crashing. `ProgressDialogResult` is sealed, so any exhaustive `switch` over a
+result now fails to compile with a message like:
+
+```
+The type 'ProgressDialogResult<String>' isn't exhaustively matched by the switch
+cases since it doesn't match the pattern 'Cancelled<String>()'.
+```
+
+Add the missing arm:
+
+```dart
+switch (result) {
+  case Success(:final value):
+    // ...
+  case Failure(:final error):
+    // ...
+  case Cancelled():          // <-- add this
+    // The dialog was dismissed before the task delivered a result
+}
+```
+
+If you would rather not handle cancellation distinctly, treat it like a failure:
+
+```dart
+if (result.isCancelled) return;
+```
+
+Code using `isSuccess`, `isError`, `unwrap()`, `map()`, or `flatMap()` keeps
+compiling unchanged. Be aware that `unwrap()` now throws
+`ProgressDialogCancelledException` for a cancelled result, and that a `Success`
+holding `null` is still a `Success` — it is never reported as `Cancelled`.
+
+### `showAdaptiveProgressDialog` follows the theme, not the host OS
+
+The style is now chosen from `Theme.of(context).platform`, matching Flutter's own
+`showAdaptiveDialog`. Previously it read the host operating system through
+`dart:io`.
+
+This only changes behaviour for apps that override `ThemeData.platform` — those
+now get the dialog style they asked for. It is also what makes the package work
+on Flutter Web, where the old check threw. To pin one style regardless of
+platform, call `showProgressDialog` or `showCupertinoProgressDialog` directly.
 
 ## Known limitations
 

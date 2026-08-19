@@ -34,7 +34,9 @@ sealed class ProgressDialogResult<T> {
   static ProgressDialogResult<T> success<T>(T value) => Success(value);
 
   /// Creates a failure result with the given error and optional stack trace
-  static ProgressDialogResult<T> failure<T>(Object error, [StackTrace? stackTrace]) => Failure(error, stackTrace);
+  static ProgressDialogResult<T> failure<T>(Object error,
+          [StackTrace? stackTrace]) =>
+      Failure(error, stackTrace);
 
   /// Creates a cancelled result
   static ProgressDialogResult<T> cancelled<T>() => Cancelled<T>();
@@ -59,7 +61,8 @@ sealed class ProgressDialogResult<T> {
   }
 
   /// Chains results by applying the provided function to success values
-  ProgressDialogResult<R> flatMap<R>(ProgressDialogResult<R> Function(T value) fn) {
+  ProgressDialogResult<R> flatMap<R>(
+      ProgressDialogResult<R> Function(T value) fn) {
     return switch (this) {
       Success(:final value) => fn(value),
       Failure(:final error, :final stackTrace) => Failure(error, stackTrace),
@@ -79,7 +82,10 @@ class Success<T> extends ProgressDialogResult<T> {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is Success && runtimeType == other.runtimeType && value == other.value;
+      identical(this, other) ||
+      other is Success &&
+          runtimeType == other.runtimeType &&
+          value == other.value;
 
   @override
   int get hashCode => value.hashCode;
@@ -98,7 +104,10 @@ class Failure<T> extends ProgressDialogResult<T> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Failure && runtimeType == other.runtimeType && error == other.error && stackTrace == other.stackTrace;
+      other is Failure &&
+          runtimeType == other.runtimeType &&
+          error == other.error &&
+          stackTrace == other.stackTrace;
 
   @override
   int get hashCode => error.hashCode ^ stackTrace.hashCode;
@@ -121,7 +130,9 @@ class Cancelled<T> extends ProgressDialogResult<T> {
   bool get isCancelled => true;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is Cancelled && runtimeType == other.runtimeType;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Cancelled && runtimeType == other.runtimeType;
 
   @override
   int get hashCode => runtimeType.hashCode;
@@ -135,5 +146,6 @@ class ProgressDialogCancelledException implements Exception {
   const ProgressDialogCancelledException();
 
   @override
-  String toString() => 'ProgressDialogCancelledException: the progress dialog was dismissed before the task completed';
+  String toString() =>
+      'ProgressDialogCancelledException: the progress dialog was dismissed before the task completed';
 }
