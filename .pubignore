@@ -9,3 +9,12 @@ pubspec.lock
 .ios/
 img
 build
+
+# Generated platform scaffolding for the example app.
+# Not needed by consumers; recreate with `flutter create .` inside example/.
+example/android/
+example/ios/
+example/linux/
+example/macos/
+example/web/
+example/windows/
