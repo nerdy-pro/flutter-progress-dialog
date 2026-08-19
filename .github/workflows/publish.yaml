@@ -1,7 +1,14 @@
 name: Publish to pub.dev
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      # Must align with the tag pattern configured on pub.dev: 'v{{version}}'.
+      # Creating a GitHub release with a new v2.0.0 tag pushes the tag and so
+      # triggers this workflow. pub.dev rejects automated publishing from any
+      # workflow that was not triggered by a tag push, so this must stay a
+      # `push: tags:` trigger — `release:` or `workflow_dispatch` will not work.
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
 
@@ -19,6 +26,19 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      # Fail early with a clear message if the tag and pubspec.yaml disagree.
+      # pub.dev would reject the upload anyway, but only after the whole
+      # pipeline has run and the approval has been granted.
+      - name: Check tag matches pubspec version
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          pubspec_version="$(sed -n 's/^version: *//p' pubspec.yaml | tr -d '\r')"
+          if [ "$tag_version" != "$pubspec_version" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match pubspec.yaml version ${pubspec_version}"
+            exit 1
+          fi
+          echo "Publishing version ${pubspec_version}"
 
       - name: Analyze project source
         run: dart analyze --fatal-infos
